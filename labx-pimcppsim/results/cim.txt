@@ -1,0 +1,5 @@
+array=3x2 tile=64x32 bus_bytes=16
+program_cycles=3
+vector[0] output: 7 -10 | input=1 compute=9 readout=1 latency=11 cycles
+vector[1] output: -10 28 | input=1 compute=9 readout=1 latency=11 cycles
+total_cycles=25

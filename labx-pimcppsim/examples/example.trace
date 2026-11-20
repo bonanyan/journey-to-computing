@@ -1,0 +1,8 @@
+# STORE writes bytes; LOAD reads signed little-endian 64-bit words.
+STORE 0 1 -2 3 4 -5 6
+STORE 64 2 0 -1
+PROGRAM 0 3 2
+SUBMIT first 64 128
+WORK 6
+WAIT first
+LOAD 128 2

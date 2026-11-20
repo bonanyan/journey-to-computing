@@ -1,0 +1,11 @@
+[size] 1100 600
+[signals_width] 220
+@28
+tb_dpim.dut.clk
+tb_dpim.dut.en
+tb_dpim.dut.we
+tb_dpim.dut.cme
+@22
+tb_dpim.dut.addr[11:0]
+tb_dpim.dut.d[31:0]
+tb_dpim.dut.q[31:0]

@@ -1,0 +1,25 @@
+[size] 1200 760
+[signals_width] 230
+@28
+tb_apim.dut.clk
+tb_apim.dut.cs
+tb_apim.dut.web
+tb_apim.dut.cimeb
+@22
+tb_apim.dut.a[9:0]
+tb_apim.dut.d[7:0]
+tb_apim.dut.q[7:0]
+@24
+tb_apim.dut.cim_in0[3:0]
+tb_apim.dut.cim_in1[3:0]
+tb_apim.dut.cim_in2[3:0]
+tb_apim.dut.cim_in3[3:0]
+tb_apim.dut.cim_out0_tmp[13:0]
+tb_apim.dut.cim_out0[5:0]
+tb_apim.dut.cim_out1[5:0]
+tb_apim.dut.cim_out2[5:0]
+tb_apim.dut.cim_out3[5:0]
+tb_apim.dut.cim_out4[5:0]
+tb_apim.dut.cim_out5[5:0]
+tb_apim.dut.cim_out6[5:0]
+tb_apim.dut.cim_out7[5:0]
