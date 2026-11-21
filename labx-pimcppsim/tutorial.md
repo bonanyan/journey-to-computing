@@ -1,5 +1,7 @@
 # How to write a CPU–PIM performance simulator
 
+Directly run RTL simulation might be too slow for large-scale integrations. Therefore, we need to develop a way to quickly simulate the behavior of CPU and PIM for performance and functions.
+
 A CPU submits a matrix–vector multiply to a processing-in-memory (PIM) accelerator, does six cycles of independent work, and reads the answer. When can the CPU use it? In this simulator the multiply takes nine cycles, the result reaches shared memory at cycle 18, and the CPU finishes its load at cycle 19. Writing the simulator means accounting for each of those times as well as computing the right answer.
 
 Build it in two stages. First implement the computing-in-memory (CIM) macro and give its operations a cycle cost. Then add a CPU that executes a trace, a direct memory access (DMA) engine that moves the operands and results, and one memory port shared by both. Run the commands below from the directory containing the Makefile. The C++17 reference implementations are [simulators/cim.cpp](./simulators/cim.cpp) and [simulators/cosim.cpp](./simulators/cosim.cpp).

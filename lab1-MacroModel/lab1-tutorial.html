@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lab 1 tutorial: simulate digital and analog processing-in-memory macros with Verilator and GTKWave.">
+  <title>Lab 1 · Simulate a processing-in-memory macro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=PT+Mono&amp;family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --page-bg: #f4f7fa;
+      --surface: #ffffff;
+      --text: #263746;
+      --heading: #123c52;
+      --muted: #5b6b78;
+      --accent: #087a96;
+      --accent-dark: #075e74;
+      --border: #d9e3ea;
+      --code-bg: #f1f5f8;
+      --table-header: #eaf2f6;
+      --table-stripe: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--page-bg);
+      color: var(--text);
+      font-family: "PT Sans", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main {
+      width: min(100% - 2rem, 1040px);
+      margin: 3rem auto;
+      padding: clamp(1.5rem, 5vw, 4rem);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 12px 36px rgba(27, 55, 72, 0.07);
+    }
+
+    h1,
+    h2 {
+      color: var(--heading);
+      line-height: 1.25;
+      text-wrap: balance;
+    }
+
+    h1 {
+      margin: 0 0 1.75rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 3px solid var(--accent);
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: -0.025em;
+    }
+
+    h2 {
+      margin: 3rem 0 1.25rem;
+      padding-bottom: 0.55rem;
+      border-bottom: 1px solid var(--border);
+      font-size: clamp(1.45rem, 3vw, 1.9rem);
+      letter-spacing: -0.012em;
+    }
+
+    h1 + p {
+      color: #344d5e;
+      font-size: 1.12em;
+    }
+
+    p {
+      margin: 0 0 1.15rem;
+    }
+
+    strong {
+      color: var(--heading);
+      font-weight: 700;
+    }
+
+    a {
+      color: var(--accent-dark);
+      text-decoration: underline;
+      text-decoration-color: #8abcc9;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.18em;
+    }
+
+    a:hover {
+      color: var(--accent);
+      text-decoration-color: currentColor;
+    }
+
+    a:focus-visible {
+      outline: 3px solid #65b7ca;
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    code,
+    pre,
+    kbd,
+    samp {
+      font-family: "PT Mono", "SFMono-Regular", Consolas, monospace;
+    }
+
+    code {
+      padding: 0.12em 0.34em;
+      background: var(--code-bg);
+      border: 1px solid #dfe8ee;
+      border-radius: 4px;
+      color: #174c60;
+      font-size: 0.88em;
+      overflow-wrap: anywhere;
+    }
+
+    pre {
+      margin: 1.5rem 0;
+      padding: 1.15rem 1.3rem;
+      overflow-x: auto;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      color: #173e50;
+      line-height: 1.6;
+      tab-size: 4;
+    }
+
+    pre code {
+      padding: 0;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      color: inherit;
+      font-size: 0.9rem;
+      overflow-wrap: normal;
+      white-space: pre;
+    }
+
+    .table-wrapper {
+      margin: 1.5rem 0 1.75rem;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    th,
+    td {
+      padding: 0.72rem 0.85rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: var(--table-header);
+      color: var(--heading);
+      font-weight: 700;
+    }
+
+    th:not(:last-child),
+    td:not(:last-child) {
+      border-right: 1px solid var(--border);
+    }
+
+    tbody tr:nth-child(even) {
+      background: var(--table-stripe);
+    }
+
+    tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    td code,
+    th code {
+      white-space: nowrap;
+    }
+
+    ::selection {
+      background: #cceaf1;
+      color: #123c52;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        background: var(--surface);
+        font-size: 16px;
+      }
+
+      main {
+        width: 100%;
+        margin: 0;
+        padding: 1.4rem;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      h2 {
+        margin-top: 2.4rem;
+      }
+    }
+
+    @media print {
+      @page {
+        margin: 18mm;
+      }
+
+      body {
+        background: #ffffff;
+        color: #000000;
+        font-size: 11pt;
+      }
+
+      main {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      h1,
+      h2,
+      strong,
+      th {
+        color: #000000;
+      }
+
+      h1 {
+        font-size: 24pt;
+      }
+
+      h2 {
+        margin-top: 2rem;
+        font-size: 16pt;
+        break-after: avoid;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      pre,
+      .table-wrapper {
+        overflow: visible;
+        break-inside: avoid;
+      }
+
+      table {
+        min-width: 0;
+        font-size: 9pt;
+      }
+
+      pre,
+      code,
+      th {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+<h1 id="lab-1--simulate-a-processing-in-memory-macro">Lab 1 · Simulate a
+processing-in-memory macro</h1>
+<p>What can you get back from a memory array on one rising clock edge?
+Start with a single 32-bit read (MEM). Then use the same digital
+processing-in-memory macro (DPIM) to operate on 32 stored words in
+parallel. Finally, program a 4 × 8 weight matrix into an analog
+processing-in-memory macro (APIM) and watch eight dot products become
+six-bit output codes.</p>
+<p>The supplied PISLIB has two RTL modules. MEM uses the scalar port on
+<code>DPIM</code>. APIM uses <code>Basic_GeMM_CIM</code>, an unsigned
+integer model of an ideal analog multiply–accumulate and
+analog-to-digital converter (ADC). Each trace shows the clock edges
+visible to a macro user. The 10 ns testbench clock is a stimulus
+setting. <a href="pislib_verilog-main/src/DPIM.v">Digital RTL</a> · <a
+href="pislib_verilog-main/src/APIM.v">Analog RTL</a></p>
+<h2 id="build-and-run">Build and run</h2>
+<p>Use Verilator 5 with timing support, a C++20 compiler with
+coroutines, GNU Make, and GTKWave. On Ubuntu 24.04, for example, install
+them with
+<code>sudo apt install build-essential verilator gtkwave</code>. From
+the directory containing this tutorial, run the following commands.</p>
+<pre class="sh"><code>verilator --version
+make</code></pre>
+<p>Look for three lines starting with <strong>PASS MEM</strong>,
+<strong>PASS DPIM</strong>, and <strong>PASS APIM</strong>. A mismatch
+stops the simulation and reports the expected and observed values.
+Verilator writes one VCD (Value Change Dump) file per experiment. The
+simulations can run on a machine without a display.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th>Experiment</th>
+<th>Run again</th>
+<th>Open the trace with signals selected</th>
+<th>Trace</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MEM</td>
+<td><code>make mem</code></td>
+<td><code>make wave-mem</code></td>
+<td><code>build/mem.vcd</code></td>
+</tr>
+<tr>
+<td>DPIM</td>
+<td><code>make dpim</code></td>
+<td><code>make wave-dpim</code></td>
+<td><code>build/dpim.vcd</code></td>
+</tr>
+<tr>
+<td>APIM</td>
+<td><code>make apim</code></td>
+<td><code>make wave-apim</code></td>
+<td><code>build/apim.vcd</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>In GTKWave, use <strong>Zoom Fit</strong> to see the whole run. Click
+just after a rising edge to place the time marker and read the signal
+values. The benches drive controls on a falling edge, the macro acts on
+the next rising edge, and the bench checks the result 1 ns later. A gap
+of five nanoseconds between an input change and an output change is
+visible in these traces. Both benches program every word they use. <a
+href="Makefile">Makefile</a> · <a href="tb/tb_dpim.sv">MEM and DPIM
+stimulus</a> · <a href="tb/tb_apim.sv">APIM stimulus</a></p>
+<h2 id="1-mem--read-one-stored-word">1. MEM · Read one stored word</h2>
+<p>Run <code>make wave-mem</code>. The digital macro contains 4,096
+words of 32 bits. With <code>en=1</code>, a rising edge writes
+<code>d</code> to <code>mem[addr]</code> when <code>we=1</code>. A
+scalar read uses <code>we=0, cme=1</code> and copies the selected word
+to <code>q</code>. A low <code>en</code> disables both operations.</p>
+<p>Find the first two writes. Addresses <code>0x012</code> and
+<code>0x092</code> differ in just bit 7. Predict what will appear on
+<code>q</code> when the bench comes back to each address.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Rising edge</th>
+<th>Transaction</th>
+<th>What to look for</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">15 ns</td>
+<td>Write <code>1234abcd</code> to <code>012</code></td>
+<td><code>en=1</code>, <code>we=1</code>, write data on
+<code>d</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">25 ns</td>
+<td>Write <code>cafe0055</code> to <code>092</code></td>
+<td>A different word is selected</td>
+</tr>
+<tr>
+<td style="text-align: right;">35 ns</td>
+<td>Read <code>012</code></td>
+<td><code>q=1234abcd</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">45 ns</td>
+<td>Attempt to write <code>ffffffff</code> to <code>092</code> with
+<code>en=0</code></td>
+<td><code>q</code> holds <code>1234abcd</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">55 ns</td>
+<td>Read <code>092</code></td>
+<td><code>q=cafe0055</code>, confirming the disabled write had no
+effect</td>
+</tr>
+<tr>
+<td style="text-align: right;">65 ns</td>
+<td>Overwrite <code>092</code> with <code>deadbeef</code></td>
+<td><code>d=deadbeef</code> while <code>q=cafe0055</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">75 ns and 85 ns</td>
+<td>Read <code>092</code>, then <code>012</code></td>
+<td><code>q=deadbeef</code>, then <code>1234abcd</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Check your trace.</strong> Put the cursor at 66 ns and again
+at 76 ns. Which edge first makes the overwritten value visible on the
+read port? Keep addresses <code>012</code> and <code>092</code> in mind
+for the digital compute experiment.</p>
+<h2 id="2-dpim--operate-on-32-words-at-once">2. DPIM · Operate on 32
+words at once</h2>
+<p>Run <code>make wave-dpim</code>. On a scalar access, all 12 address
+bits select one word. On a compute edge
+(<code>en=1, we=0, cme=0</code>), each lane supplies its own upper five
+address bits. Follow the <code>if (cme)</code> branch in the RTL to see
+the mode polarity. The 32 lanes share the low seven address bits and the
+function selector.</p>
+<pre class="text"><code>word_address(lane) = 128 × lane + addr[6:0]
+cmOut[lane]        = operation(cmIn[lane], mem[word_address(lane)])</code></pre>
+<p>The bench writes <code>0x80000010 + lane</code> at offset
+<code>0x12</code> in each lane, then drives
+<code>cmIn[lane] = 0x13 + lane</code>. At 335 ns a scalar read of
+<code>0x092</code> returns lane 1's stored word,
+<code>0x80000011</code>. At 345 ns the address bus reads
+<code>0xf92</code>. Its low seven bits still select offset
+<code>0x12</code>, so lane 0 uses <code>0x012</code>, lane 1 uses
+<code>0x092</code>, and lane 31 uses <code>0xf92</code> on the same
+edge. Read the results on <code>cmOut_00</code> and
+<code>cmOut_01</code>. <a
+href="pislib_verilog-main/doc/DPIM_AddressMap.pdf">Digital address
+map</a></p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Rising edge</th>
+<th><code>func</code></th>
+<th>Operation</th>
+<th>Lane 0 (hex)</th>
+<th>Lane 1 (hex)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">345 ns</td>
+<td><code>00</code></td>
+<td>Multiply, low 32 bits</td>
+<td><code>80000130</code></td>
+<td><code>00000154</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">355 ns</td>
+<td><code>01</code></td>
+<td>Bitwise AND</td>
+<td><code>00000010</code></td>
+<td><code>00000010</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">365 ns</td>
+<td><code>10</code></td>
+<td>Bitwise OR</td>
+<td><code>80000013</code></td>
+<td><code>80000015</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">375 ns</td>
+<td><code>11</code></td>
+<td>Bitwise XOR</td>
+<td><code>80000003</code></td>
+<td><code>80000005</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Check your trace.</strong> Predict lane 31's XOR result from
+its weight and input. Expand <code>tb_dpim → dut</code> in the signal
+tree, add <code>cmOut_31</code>, and check at 376 ns. Compare it with
+<code>q</code>, which still holds the scalar read from 335 ns. The
+testbench checks all 128 lane results across the four compute edges.</p>
+<h2 id="3-apim--quantize-eight-dot-products">3. APIM · Quantize eight
+dot products</h2>
+<p>Run <code>make wave-apim</code>. This macro stores 1,024 unsigned
+bytes. With <code>cs=1</code>, set <code>web=0</code> to write one byte.
+Set <code>web=1, cimeb=1</code> to read one byte on <code>q</code>, or
+<code>web=1, cimeb=0</code> to compute. The write-enable polarity is the
+opposite of the digital macro's <code>we</code>.</p>
+<p>A ten-bit programming address packs four fields. During compute the
+address bus supplies the <strong>group</strong> and
+<strong>slot</strong>. The macro visits all four input rows and all
+eight output columns in that group and slot.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th>Address bits</th>
+<th>Field</th>
+<th>How the experiment uses it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>[9:8]</code></td>
+<td>Input row</td>
+<td>One weight for each of <code>cim_in0</code> through
+<code>cim_in3</code></td>
+</tr>
+<tr>
+<td><code>[7:5]</code></td>
+<td>Group</td>
+<td><code>2</code></td>
+</tr>
+<tr>
+<td><code>[4:2]</code></td>
+<td>Output column</td>
+<td>One four-weight dot product for each of eight outputs</td>
+</tr>
+<tr>
+<td><code>[1:0]</code></td>
+<td>Slot</td>
+<td><code>1</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The first 32 writes set
+<code>weight[row][col] = 16 × (row + 1) + 24 × col</code>. For column 0,
+the bytes at <code>0x041</code>, <code>0x141</code>, <code>0x241</code>,
+and <code>0x341</code> hold 16, 32, 48, and 64. At 335 ns, a scalar read
+from <code>0x35d</code> returns <code>0xe8</code> (row 3, column 7). Set
+a second marker just after 345 ns, when the macro accepts the input
+vector <code>[1, 2, 3, 4]</code>. <a
+href="pislib_verilog-main/doc/PIMAddressMap.pdf">Analog address
+map</a></p>
+<pre class="text"><code>column 0 sum  = 1×16 + 2×32 + 3×48 + 4×64 = 480
+column 0 code = floor(480 / 256) = 1
+column j sum  = 480 + 240×j
+output codes  = [1, 2, 3, 4, 5, 6, 7, 8]</code></pre>
+<p>The six-bit ADC output takes bits <code>[13:8]</code> of the unsigned
+sum, dropping the low eight bits. The supplied APIM source originally
+declared its intermediate sums six bits wide, which put the output slice
+outside the register. The lab widens the eight <code>cim_out*_tmp</code>
+registers to 14 bits, matching the reference calculation in the supplied
+APIM testbench. The GTKWave view shows the full column 0 sum and all
+eight ADC codes in decimal. <a
+href="pislib_verilog-main/src/APIM.v">APIM RTL</a> · <a
+href="pislib_verilog-main/src/APIM_tb.v">Original reference
+calculation</a></p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Rising edge</th>
+<th>Column 0 operation</th>
+<th style="text-align: right;"><code>cim_out0_tmp</code></th>
+<th style="text-align: right;"><code>cim_out0</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">345 ns</td>
+<td>Dot product with the first vector</td>
+<td style="text-align: right;">480</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: right;">375 ns</td>
+<td>After programming two weights to 255 and 1, apply
+<code>[1, 0, 0, 0]</code></td>
+<td style="text-align: right;">255</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: right;">385 ns</td>
+<td>Keep the weights and apply <code>[1, 1, 0, 0]</code></td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: right;">435 ns</td>
+<td>Set all four weights to 255 and all four inputs to 15</td>
+<td style="text-align: right;">15,300</td>
+<td style="text-align: right;">59</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Check your trace.</strong> At 375 and 385 ns, the raw sums
+differ by one. Which bit changes the ADC code? Use the largest possible
+sum at 435 ns to explain why codes 60 through 63 are unreachable for
+these operand widths.</p>
+<h2 id="try-a-new-vector">Try a new vector</h2>
+<p>In <code>tb/tb_apim.sv</code>, insert
+<code>compute(0, 0, 0, 4);</code> immediately after
+<code>compute(1, 2, 3, 4);</code>. This selects the fourth stored row
+and scales each weight by four. Before running it, calculate the first
+and last output codes from that row's weights, 64 and 232. Then run
+<code>make wave-apim</code> and read the new result at 355 ns. The bench
+computes its expected values from the programmed matrix, so it checks
+the new vector automatically. Later edges move forward by 10 ns. Remove
+the extra call to return to the timing table above.</p>
+<p>For your lab notes, record one scalar transaction with its address
+and read data, one DPIM lane with both operands and its result, and one
+APIM column with its full sum and ADC code. For each, mark the rising
+edge where the result becomes visible.</p>
+<h2 id="takeaway-messages">Takeaway messages</h2>
+<p>Now you know how a PIM (actually work).</p>
+  </main>
+</body>
+</html>
