@@ -1,8 +1,0 @@
-sequence,operation,start_cycle,end_cycle,cycles,cells_written,adc_conversions,row_groups,input_bits
-0,weight_load,0,13,13,48,0,0,0
-1,vmm,13,119,106,0,96,2,4
-2,row_write,119,122,3,8,0,0,0
-3,row_write,122,125,3,8,0,0,0
-4,and,125,128,3,0,0,0,0
-5,or,128,131,3,0,0,0,0
-6,xor,131,135,4,0,0,0,0

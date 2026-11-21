@@ -1,4 +1,0 @@
-program_cycles=3 ready=5
-job=first input_done=8 compute_done=17 write_start=17 visible=18
-load@128 cycle=19 values: 7 -10
-cpu_finished=19 cpu_blocked=8 total_cycles=19

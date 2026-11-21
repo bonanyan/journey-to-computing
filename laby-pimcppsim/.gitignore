@@ -1,6 +1,0 @@
-build/
-*.o
-results/*
-!results/.gitkeep
-simulators/pim-only/cim_sim
-simulators/pim-only/cim_tests

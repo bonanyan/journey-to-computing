@@ -1,0 +1,4 @@
+PASS examples/lab2/row_switch.hex exit_value=0 instructions=65 dpim_transactions=18 commands=3 dpim_bus_edges=54
+PASS examples/lab2/vector_mul.hex exit_value=0 instructions=576 dpim_transactions=98 commands=1 dpim_bus_edges=294
+PASS examples/lab2/bit_masks.hex exit_value=0 instructions=1560 dpim_transactions=166 commands=3 dpim_bus_edges=498
+PASS examples/lab2/memory_sweep.hex exit_value=0 instructions=45114 dpim_transactions=8206 commands=0 dpim_bus_edges=24624
