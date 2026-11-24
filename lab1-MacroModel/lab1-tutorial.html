@@ -281,12 +281,34 @@
         -webkit-print-color-adjust: exact;
       }
     }
+
+    .tutorial-header .tutorial-logo {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto 1rem;
+    }
+
+    .tutorial-header h1 {
+      margin: 0 0 0.75rem;
+    }
+
+    .tutorial-header .tutorial-byline {
+      margin: 0;
+      text-align: center;
+      font-size: 0.95em;
+    }
   </style>
 </head>
 <body>
   <main>
-<h1 id="lab-1--simulate-a-processing-in-memory-macro">Lab 1 · Simulate a
+<header class="tutorial-header">
+  <img class="tutorial-logo" src="../assets/journey-computing-jc_v2.png" alt="Journey to Computing logo" width="144" height="86" />
+  <h1 id="lab-1--simulate-a-processing-in-memory-macro">Lab 1 · Simulate a
 processing-in-memory macro</h1>
+  <p class="tutorial-byline"><strong>Author:</strong> Dr. Bonan Yan (<a href="mailto:bonanyan@pku.edu.cn">bonanyan@pku.edu.cn</a>) · <time datetime="2026-11-22">November 22, 2026</time></p>
+</header>
+<h2 id="what-to-do">What to do</h2>
 <p>What can you get back from a memory array on one rising clock edge?
 Start with a single 32-bit read (MEM). Then use the same digital
 processing-in-memory macro (DPIM) to operate on 32 stored words in
@@ -300,7 +322,7 @@ analog-to-digital converter (ADC). Each trace shows the clock edges
 visible to a macro user. The 10 ns testbench clock is a stimulus
 setting. <a href="pislib_verilog-main/src/DPIM.v">Digital RTL</a> · <a
 href="pislib_verilog-main/src/APIM.v">Analog RTL</a></p>
-<h2 id="build-and-run">Build and run</h2>
+<h2 id="how-to-run">How to run</h2>
 <p>Use Verilator 5 with timing support, a C++20 compiler with
 coroutines, GNU Make, and GTKWave. On Ubuntu 24.04, for example, install
 them with

@@ -1,0 +1,2485 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   viewBox="0 0 1610 1830"
+   width="1610"
+   height="1830"
+   role="img"
+   aria-labelledby="figure-title figure-description"
+   id="svg128"
+   sodipodi:docname="qwen3-4b-1-layer.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview128"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1" />
+  <title
+     id="figure-title">Qwen3-4B decoder layer: operator and tensor dataflow</title>
+  <desc
+     id="figure-description">One autoregressive inference step at position p. Every arrow is labelled with its source tensor equation. Follow query, key and value projections through grouped-query attention, then the SwiGLU feed-forward network. Dashed paths carry the two residual connections. All projections use column vectors and bias-free learned matrices. Layer weights and normalization gains are implicit parameters. The visible KV prefixes are the cache state for the next step.</desc>
+  <defs
+     id="defs6">
+    <marker
+       id="arrow-main"
+       orient="auto"
+       markerUnits="userSpaceOnUse"
+       markerWidth="10"
+       markerHeight="10"
+       refX="9"
+       refY="5"
+       viewBox="0 0 10 10">
+      <path
+         d="M 0,0.9 9.3,5 0,9.1 2.2,5 Z"
+         fill="#455c68"
+         id="path1" />
+    </marker>
+    <marker
+       id="arrow-query"
+       orient="auto"
+       markerUnits="userSpaceOnUse"
+       markerWidth="10"
+       markerHeight="10"
+       refX="9"
+       refY="5"
+       viewBox="0 0 10 10">
+      <path
+         d="M 0,0.9 9.3,5 0,9.1 2.2,5 Z"
+         fill="#356695"
+         id="path2" />
+    </marker>
+    <marker
+       id="arrow-key"
+       orient="auto"
+       markerUnits="userSpaceOnUse"
+       markerWidth="10"
+       markerHeight="10"
+       refX="9"
+       refY="5"
+       viewBox="0 0 10 10">
+      <path
+         d="M 0,0.9 9.3,5 0,9.1 2.2,5 Z"
+         fill="#257469"
+         id="path3" />
+    </marker>
+    <marker
+       id="arrow-value"
+       orient="auto"
+       markerUnits="userSpaceOnUse"
+       markerWidth="10"
+       markerHeight="10"
+       refX="9"
+       refY="5"
+       viewBox="0 0 10 10">
+      <path
+         d="M 0,0.9 9.3,5 0,9.1 2.2,5 Z"
+         fill="#98612f"
+         id="path4" />
+    </marker>
+    <marker
+       id="arrow-ffn"
+       orient="auto"
+       markerUnits="userSpaceOnUse"
+       markerWidth="10"
+       markerHeight="10"
+       refX="9"
+       refY="5"
+       viewBox="0 0 10 10">
+      <path
+         d="M 0,0.9 9.3,5 0,9.1 2.2,5 Z"
+         fill="#705788"
+         id="path5" />
+    </marker>
+    <marker
+       id="arrow-res"
+       orient="auto"
+       markerUnits="userSpaceOnUse"
+       markerWidth="10"
+       markerHeight="10"
+       refX="9"
+       refY="5"
+       viewBox="0 0 10 10">
+      <path
+         d="M 0,0.9 9.3,5 0,9.1 2.2,5 Z"
+         fill="#576e7b"
+         id="path6" />
+    </marker>
+  </defs>
+  <g
+     id="page"
+     inkscape:groupmode="layer"
+     inkscape:label="Page and notation">
+    <rect
+       x="0"
+       y="0"
+       width="1610"
+       height="1830"
+       fill="#ffffff"
+       id="rect6" />
+    <text
+       x="62"
+       y="77"
+       fill="#172e38"
+       text-anchor="start"
+       font-size="52"
+       font-family="Verdana"
+       font-weight="650"
+       letter-spacing="-1.8"
+       id="text6">Qwen3-4B decoder layer</text>
+    <text
+       x="64"
+       y="117"
+       fill="#4c626d"
+       text-anchor="start"
+       font-size="21"
+       font-family="Verdana"
+       font-weight="400"
+       id="text7">One token at position p passes through grouped-query attention and a SwiGLU feed-forward network.</text>
+    <path
+       d="M 64,148 L 1546,148"
+       stroke="#28434d"
+       stroke-width="1.7"
+       fill="none"
+       id="path7" />
+    <text
+       x="64"
+       y="195"
+       fill="#172e38"
+       text-anchor="start"
+       font-size="25"
+       font-family="Verdana"
+       font-weight="620"
+       letter-spacing="-0.55"
+       id="text8">Grouped-query attention</text>
+    <text
+       x="1545"
+       y="195"
+       fill="#4c626d"
+       text-anchor="end"
+       font-size="17"
+       font-family="Verdana"
+       font-weight="400"
+       id="text9">32 query heads (h)   ·   8 KV heads (g)   ·   128 features per head</text>
+    <text
+       x="97"
+       y="1230"
+       fill="#172e38"
+       text-anchor="start"
+       font-size="25"
+       font-family="Verdana"
+       font-weight="620"
+       letter-spacing="-0.55"
+       id="text10">Feed-forward</text>
+    <text
+       x="1545"
+       y="1230"
+       fill="#4c626d"
+       text-anchor="end"
+       font-size="17"
+       font-family="Verdana"
+       font-weight="400"
+       id="text11">SwiGLU intermediate width   ·   9,728</text>
+    <path
+       d="M 98,1194 L 261,1194"
+       stroke="#d5dede"
+       stroke-width="1"
+       fill="none"
+       id="path11" />
+    <path
+       d="M 322,1194 L 1546,1194"
+       stroke="#d5dede"
+       stroke-width="1"
+       fill="none"
+       id="path12" />
+    <rect
+       x="0"
+       y="1630"
+       width="1610"
+       height="200"
+       fill="#f2f5f4"
+       id="rect12" />
+    <path
+       d="M 64,1630 L 1546,1630"
+       stroke="#ccd8d8"
+       stroke-width="1"
+       fill="none"
+       id="path13" />
+    <path
+       d="M 531,1655 L 531,1803"
+       stroke="#d5dede"
+       stroke-width="1"
+       fill="none"
+       id="path14" />
+    <path
+       d="M 1059,1655 L 1059,1803"
+       stroke="#d5dede"
+       stroke-width="1"
+       fill="none"
+       id="path15" />
+    <text
+       x="64"
+       y="1678"
+       fill="#172e38"
+       text-anchor="start"
+       font-size="20"
+       font-family="Verdana"
+       font-weight="620"
+       id="text15">RMS normalization</text>
+    <text
+       x="559"
+       y="1678"
+       fill="#172e38"
+       text-anchor="start"
+       font-size="20"
+       font-family="Verdana"
+       font-weight="620"
+       id="text16">Rotary position embedding</text>
+    <text
+       x="1088"
+       y="1678"
+       fill="#172e38"
+       text-anchor="start"
+       font-size="20"
+       font-family="Verdana"
+       font-weight="620"
+       id="text17">Causal softmax</text>
+    <text
+       x="64"
+       y="1719"
+       fill="#233b49"
+       text-anchor="start"
+       font-size="22"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="text18">N(v, γ) = γ ⊙ v / √(mean(v²) + ε)</text>
+    <text
+       x="64"
+       y="1756"
+       fill="#4c626d"
+       text-anchor="start"
+       font-size="16"
+       font-family="Verdana"
+       font-weight="400"
+       id="text19"><tspan font-family="STIX Two Math">ε = 10⁻⁶</tspan>. Each of the four norms learns its own gain.</text>
+    <text
+       x="64"
+       y="1786"
+       fill="#4c626d"
+       text-anchor="start"
+       font-size="16"
+       font-family="Verdana"
+       font-weight="400"
+       id="text20"><tspan font-family="STIX Two Math">⊙</tspan> denotes elementwise multiplication.</text>
+    <text
+       x="559"
+       y="1719"
+       fill="#233b49"
+       text-anchor="start"
+       font-size="22"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="text21">ω<tspan
+   baseline-shift="sub"
+   font-size="15.62"
+   id="tspan20">j</tspan> = (10⁶)<tspan
+   baseline-shift="super"
+   font-size="15.62"
+   id="tspan21">−2j/128</tspan>     (0 ≤ j &lt; 64)</text>
+    <text
+       x="559"
+       y="1755"
+       fill="#233b49"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="text24">R<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan22">θ</tspan>(a, b) = (a cos θ<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan23">j</tspan> − b sin θ<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan24">j</tspan>,</text>
+    <text
+       x="665"
+       y="1784"
+       fill="#233b49"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="text26">a sin θ<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan25">j</tspan> + b cos θ<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan26">j</tspan>)</text>
+    <text
+       x="559"
+       y="1811"
+       fill="#4c626d"
+       text-anchor="start"
+       font-size="16"
+       font-family="Verdana"
+       font-weight="400"
+       id="text27">Pairs <tspan font-family="STIX Two Math">(j, j + 64)</tspan> use phases shared across all layers.</text>
+    <text
+       x="1088"
+       y="1719"
+       fill="#233b49"
+       text-anchor="start"
+       font-size="22"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="text29">Z<tspan
+   baseline-shift="sub"
+   font-size="15.62"
+   id="tspan27">h</tspan> = ∑<tspan
+   baseline-shift="sub"
+   font-size="15.62"
+   id="tspan28">0≤t≤p</tspan> exp(s<tspan
+   baseline-shift="sub"
+   font-size="15.62"
+   id="tspan29">h,t</tspan>)</text>
+    <text
+       x="1088"
+       y="1756"
+       fill="#4c626d"
+       text-anchor="start"
+       font-size="16"
+       font-family="Verdana"
+       font-weight="400"
+       id="text30">Each query head normalizes over positions 0 through p.</text>
+    <text
+       x="1088"
+       y="1786"
+       fill="#4c626d"
+       text-anchor="start"
+       font-size="16"
+       font-family="Verdana"
+       font-weight="400"
+       id="text31">The key and value prefixes include the current token.</text>
+  </g>
+  <g
+     id="connections"
+     inkscape:groupmode="layer"
+     inkscape:label="Directed connections">
+    <path
+       id="edge-input--norm-in"
+       d="M 387,261 L 657.5,261"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-input--norm-in"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-input--add-attn"
+       d="M 197,261 L 79,261 Q 70,261 70,270 L 70,1116 Q 70,1125 79,1125 L 194,1125"
+       fill="none"
+       stroke="#576e7b"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-res"
+       aria-labelledby="eq-input--add-attn"
+       stroke-dasharray="7 6"
+       marker-end="url(#arrow-res)" />
+    <path
+       id="edge-norm-in--proj-query"
+       d="M 698,289 L 698,310 Q 698,319 689,319 L 301,319 Q 292,319 292,328 L 292,354"
+       fill="none"
+       stroke="#356695"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-query"
+       aria-labelledby="eq-norm-in--proj-query"
+       marker-end="url(#arrow-query)" />
+    <path
+       id="edge-proj-query--split-query"
+       d="M 292,410 L 292,457"
+       fill="none"
+       stroke="#356695"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-query"
+       aria-labelledby="eq-proj-query--split-query"
+       marker-end="url(#arrow-query)" />
+    <path
+       id="edge-split-query--norm-query"
+       d="M 292,513 L 292,562"
+       fill="none"
+       stroke="#356695"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-query"
+       aria-labelledby="eq-split-query--norm-query"
+       marker-end="url(#arrow-query)" />
+    <path
+       id="edge-norm-query--rope-query"
+       d="M 292,618 L 292,679"
+       fill="none"
+       stroke="#356695"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-query"
+       aria-labelledby="eq-norm-query--rope-query"
+       marker-end="url(#arrow-query)" />
+    <path
+       id="edge-norm-in--proj-key"
+       d="M 760,289 L 760,354"
+       fill="none"
+       stroke="#257469"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-key"
+       aria-labelledby="eq-norm-in--proj-key"
+       marker-end="url(#arrow-key)" />
+    <path
+       id="edge-proj-key--split-key"
+       d="M 760,410 L 760,457"
+       fill="none"
+       stroke="#257469"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-key"
+       aria-labelledby="eq-proj-key--split-key"
+       marker-end="url(#arrow-key)" />
+    <path
+       id="edge-split-key--norm-key"
+       d="M 760,513 L 760,562"
+       fill="none"
+       stroke="#257469"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-key"
+       aria-labelledby="eq-split-key--norm-key"
+       marker-end="url(#arrow-key)" />
+    <path
+       id="edge-norm-key--rope-key"
+       d="M 760,618 L 760,679"
+       fill="none"
+       stroke="#257469"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-key"
+       aria-labelledby="eq-norm-key--rope-key"
+       marker-end="url(#arrow-key)" />
+    <path
+       id="edge-norm-in--proj-value"
+       d="M 822,289 L 822,310 Q 822,319 831,319 L 1181,319 Q 1190,319 1190,328 L 1190,354"
+       fill="none"
+       stroke="#98612f"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-value"
+       aria-labelledby="eq-norm-in--proj-value"
+       marker-end="url(#arrow-value)" />
+    <path
+       id="edge-proj-value--split-value"
+       d="M 1190,410 L 1190,457"
+       fill="none"
+       stroke="#98612f"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-value"
+       aria-labelledby="eq-proj-value--split-value"
+       marker-end="url(#arrow-value)" />
+    <path
+       id="edge-position--phases"
+       d="M 528,601 L 528,679"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-position--phases"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-phases--rope-query"
+       d="M 454,700 L 365.5,700"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-phases--rope-query"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-phases--rope-key"
+       d="M 602,700 L 686.5,700"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-phases--rope-key"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-rope-query--dot"
+       d="M 292,721 L 292,957 Q 292,966 283,966 L 270,966 Q 261,966 261,975 L 261,997"
+       fill="none"
+       stroke="#356695"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-query"
+       aria-labelledby="eq-rope-query--dot"
+       marker-end="url(#arrow-query)" />
+    <path
+       id="edge-rope-key--join-k"
+       d="M 760,721 L 760,779"
+       fill="none"
+       stroke="#257469"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-key"
+       aria-labelledby="eq-rope-key--join-k"
+       marker-end="url(#arrow-key)" />
+    <path
+       id="edge-split-value--join-v"
+       d="M 1190,513 L 1190,779"
+       fill="none"
+       stroke="#98612f"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-value"
+       aria-labelledby="eq-split-value--join-v"
+       marker-end="url(#arrow-value)" />
+    <path
+       id="edge-past-k--join-k"
+       d="M 967,724 L 967,798 Q 967,807 958,807 L 865,807"
+       fill="none"
+       stroke="#257469"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-key"
+       aria-labelledby="eq-past-k--join-k"
+       marker-end="url(#arrow-key)" />
+    <path
+       id="edge-past-v--join-v"
+       d="M 1450,724 L 1450,798 Q 1450,807 1441,807 L 1297.5,807"
+       fill="none"
+       stroke="#98612f"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-value"
+       aria-labelledby="eq-past-v--join-v"
+       marker-end="url(#arrow-value)" />
+    <path
+       id="edge-join-k--select-k"
+       d="M 760,835 L 760,886"
+       fill="none"
+       stroke="#257469"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-key"
+       aria-labelledby="eq-join-k--select-k"
+       marker-end="url(#arrow-key)" />
+    <path
+       id="edge-join-v--select-v"
+       d="M 1190,835 L 1190,886"
+       fill="none"
+       stroke="#98612f"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-value"
+       aria-labelledby="eq-join-v--select-v"
+       marker-end="url(#arrow-value)" />
+    <path
+       id="edge-select-k--dot"
+       d="M 655,907 L 335,907 Q 326,907 326,916 L 326,997"
+       fill="none"
+       stroke="#257469"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-key"
+       aria-labelledby="eq-select-k--dot"
+       marker-end="url(#arrow-key)" />
+    <path
+       id="edge-select-v--mix"
+       d="M 1297.5,907 L 1321,907 Q 1330,907 1330,916 L 1330,990"
+       fill="none"
+       stroke="#98612f"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-value"
+       aria-labelledby="eq-select-v--mix"
+       marker-end="url(#arrow-value)" />
+    <path
+       id="edge-dot--scale"
+       d="M 379,1018 L 496.5,1018"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-dot--scale"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-scale--softmax"
+       d="M 629.5,1018 L 793,1018"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-scale--softmax"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-softmax--mix"
+       d="M 971,1018 L 1200.5,1018"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-softmax--mix"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-mix--concat"
+       d="M 1310,1046 L 1310,1097"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-mix--concat"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-concat--out-proj"
+       d="M 1206.5,1125 L 869.5,1125"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-concat--out-proj"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-out-proj--add-attn"
+       d="M 650.5,1125 L 390,1125"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-out-proj--add-attn"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-add-attn--norm-ff"
+       d="M 292,1146 L 292,1352"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-add-attn--norm-ff"
+       marker-end="url(#arrow-main)" />
+    <path
+       id="edge-add-attn--add-ff"
+       d="M 236,1146 L 236,1162 Q 236,1171 227,1171 L 79,1171 Q 70,1171 70,1180 L 70,1582 Q 70,1591 79,1591 L 729,1591 Q 738,1591 738,1582 L 738,1561"
+       fill="none"
+       stroke="#576e7b"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-res"
+       aria-labelledby="eq-add-attn--add-ff"
+       stroke-dasharray="7 6"
+       marker-end="url(#arrow-res)" />
+    <path
+       id="edge-norm-ff--gate"
+       d="M 421.5,1368 L 433,1368 Q 442,1368 442,1359 L 442,1317 Q 442,1308 451,1308 L 570,1308"
+       fill="none"
+       stroke="#705788"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-ffn"
+       aria-labelledby="eq-norm-ff--gate"
+       marker-end="url(#arrow-ffn)" />
+    <path
+       id="edge-norm-ff--up"
+       d="M 421.5,1392 L 433,1392 Q 442,1392 442,1401 L 442,1429 Q 442,1438 451,1438 L 570,1438"
+       fill="none"
+       stroke="#705788"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-ffn"
+       aria-labelledby="eq-norm-ff--up"
+       marker-end="url(#arrow-ffn)" />
+    <path
+       id="edge-gate--silu"
+       d="M 770,1308 L 928.5,1308"
+       fill="none"
+       stroke="#705788"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-ffn"
+       aria-labelledby="eq-gate--silu"
+       marker-end="url(#arrow-ffn)" />
+    <path
+       id="edge-silu--mul"
+       d="M 1081.5,1308 L 1343,1308 Q 1352,1308 1352,1317 L 1352,1359"
+       fill="none"
+       stroke="#705788"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-ffn"
+       aria-labelledby="eq-silu--mul"
+       marker-end="url(#arrow-ffn)" />
+    <path
+       id="edge-up--mul"
+       d="M 770,1438 L 1149,1438 Q 1158,1438 1158,1429 L 1158,1389 Q 1158,1380 1167,1380 L 1242,1380"
+       fill="none"
+       stroke="#705788"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-ffn"
+       aria-labelledby="eq-up--mul"
+       marker-end="url(#arrow-ffn)" />
+    <path
+       id="edge-mul--down"
+       d="M 1352,1401 L 1352,1512"
+       fill="none"
+       stroke="#705788"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-ffn"
+       aria-labelledby="eq-mul--down"
+       marker-end="url(#arrow-ffn)" />
+    <path
+       id="edge-down--add-ff"
+       d="M 1242,1540 L 836,1540"
+       fill="none"
+       stroke="#705788"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-ffn"
+       aria-labelledby="eq-down--add-ff"
+       marker-end="url(#arrow-ffn)" />
+    <path
+       id="edge-add-ff--output"
+       d="M 640,1540 L 387,1540"
+       fill="none"
+       stroke="#455c68"
+       stroke-width="2.05"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       class="wire-main"
+       aria-labelledby="eq-add-ff--output"
+       marker-end="url(#arrow-main)" />
+  </g>
+  <g
+     id="operators"
+     inkscape:groupmode="layer"
+     inkscape:label="Operators and inputs">
+    <g
+       id="node-input"
+       inkscape:label="Layer input">
+      <title
+         id="title31">Layer input · 2,560 features</title>
+      <rect
+         x="197.0"
+         y="233.0"
+         width="190"
+         height="56"
+         fill="#172e38"
+         rx="8"
+         stroke="#172e38"
+         stroke-width="1.45"
+         id="box-input" />
+      <text
+         x="292"
+         y="259"
+         fill="#ffffff"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-input">Layer input</text>
+      <text
+         x="292"
+         y="279"
+         fill="#dce8e9"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-input">2,560 features</text>
+    </g>
+    <g
+       id="node-norm-in"
+       inkscape:label="Input RMSNorm">
+      <title
+         id="title32">Input RMSNorm · across 2,560 features</title>
+      <rect
+         x="657.5"
+         y="233.0"
+         width="205"
+         height="56"
+         fill="#f0f4f5"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-norm-in" />
+      <text
+         x="760"
+         y="259"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-norm-in">Input RMSNorm</text>
+      <text
+         x="760"
+         y="279"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-norm-in">across 2,560 features</text>
+    </g>
+    <g
+       id="node-proj-query"
+       inkscape:label="Query projection">
+      <title
+         id="title33">Query projection · 2,560 → 4,096</title>
+      <rect
+         x="181.0"
+         y="354.0"
+         width="222"
+         height="56"
+         fill="#eef4fa"
+         rx="8"
+         stroke="#86a9ca"
+         stroke-width="1.45"
+         id="box-proj-query" />
+      <text
+         x="292"
+         y="380"
+         fill="#224e79"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-proj-query">Query projection</text>
+      <text
+         x="292"
+         y="400"
+         fill="#224e79"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-proj-query">2,560 → 4,096</text>
+    </g>
+    <g
+       id="node-split-query"
+       inkscape:label="Reshape query heads">
+      <title
+         id="title34">Reshape query heads · 32 × 128</title>
+      <rect
+         x="181.0"
+         y="457.0"
+         width="222"
+         height="56"
+         fill="#eef4fa"
+         rx="8"
+         stroke="#86a9ca"
+         stroke-width="1.45"
+         id="box-split-query" />
+      <text
+         x="292"
+         y="483"
+         fill="#224e79"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-split-query">Reshape query heads</text>
+      <text
+         x="292"
+         y="503"
+         fill="#224e79"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-split-query">32 × 128</text>
+    </g>
+    <g
+       id="node-norm-query"
+       inkscape:label="Query RMSNorm">
+      <title
+         id="title35">Query RMSNorm · per head</title>
+      <rect
+         x="181.0"
+         y="562.0"
+         width="222"
+         height="56"
+         fill="#eef4fa"
+         rx="8"
+         stroke="#86a9ca"
+         stroke-width="1.45"
+         id="box-norm-query" />
+      <text
+         x="292"
+         y="588"
+         fill="#224e79"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-norm-query">Query RMSNorm</text>
+      <text
+         x="292"
+         y="608"
+         fill="#224e79"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-norm-query">per head</text>
+    </g>
+    <g
+       id="node-rope-query"
+       inkscape:label="Query RoPE">
+      <title
+         id="title36">Query RoPE</title>
+      <rect
+         x="218.5"
+         y="679.0"
+         width="147"
+         height="42"
+         fill="#eef4fa"
+         rx="8"
+         stroke="#86a9ca"
+         stroke-width="1.45"
+         id="box-rope-query" />
+      <text
+         x="292"
+         y="706"
+         fill="#224e79"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-rope-query">Query RoPE</text>
+    </g>
+    <g
+       id="node-proj-key"
+       inkscape:label="Key projection">
+      <title
+         id="title37">Key projection · 2,560 → 1,024</title>
+      <rect
+         x="654.0"
+         y="354.0"
+         width="212"
+         height="56"
+         fill="#ebf5f1"
+         rx="8"
+         stroke="#80b2a6"
+         stroke-width="1.45"
+         id="box-proj-key" />
+      <text
+         x="760"
+         y="380"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-proj-key">Key projection</text>
+      <text
+         x="760"
+         y="400"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-proj-key">2,560 → 1,024</text>
+    </g>
+    <g
+       id="node-split-key"
+       inkscape:label="Reshape key heads">
+      <title
+         id="title38">Reshape key heads · 8 × 128</title>
+      <rect
+         x="654.0"
+         y="457.0"
+         width="212"
+         height="56"
+         fill="#ebf5f1"
+         rx="8"
+         stroke="#80b2a6"
+         stroke-width="1.45"
+         id="box-split-key" />
+      <text
+         x="760"
+         y="483"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-split-key">Reshape key heads</text>
+      <text
+         x="760"
+         y="503"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-split-key">8 × 128</text>
+    </g>
+    <g
+       id="node-norm-key"
+       inkscape:label="Key RMSNorm">
+      <title
+         id="title39">Key RMSNorm · per head</title>
+      <rect
+         x="654.0"
+         y="562.0"
+         width="212"
+         height="56"
+         fill="#ebf5f1"
+         rx="8"
+         stroke="#80b2a6"
+         stroke-width="1.45"
+         id="box-norm-key" />
+      <text
+         x="760"
+         y="588"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-norm-key">Key RMSNorm</text>
+      <text
+         x="760"
+         y="608"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-norm-key">per head</text>
+    </g>
+    <g
+       id="node-rope-key"
+       inkscape:label="Key RoPE">
+      <title
+         id="title40">Key RoPE</title>
+      <rect
+         x="686.5"
+         y="679.0"
+         width="147"
+         height="42"
+         fill="#ebf5f1"
+         rx="8"
+         stroke="#80b2a6"
+         stroke-width="1.45"
+         id="box-rope-key" />
+      <text
+         x="760"
+         y="706"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-rope-key">Key RoPE</text>
+    </g>
+    <g
+       id="node-proj-value"
+       inkscape:label="Value projection">
+      <title
+         id="title41">Value projection · 2,560 → 1,024</title>
+      <rect
+         x="1084.0"
+         y="354.0"
+         width="212"
+         height="56"
+         fill="#fbf3e8"
+         rx="8"
+         stroke="#cca47d"
+         stroke-width="1.45"
+         id="box-proj-value" />
+      <text
+         x="1190"
+         y="380"
+         fill="#7a4b25"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-proj-value">Value projection</text>
+      <text
+         x="1190"
+         y="400"
+         fill="#7a4b25"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-proj-value">2,560 → 1,024</text>
+    </g>
+    <g
+       id="node-split-value"
+       inkscape:label="Reshape value heads">
+      <title
+         id="title42">Reshape value heads · 8 × 128</title>
+      <rect
+         x="1084.0"
+         y="457.0"
+         width="212"
+         height="56"
+         fill="#fbf3e8"
+         rx="8"
+         stroke="#cca47d"
+         stroke-width="1.45"
+         id="box-split-value" />
+      <text
+         x="1190"
+         y="483"
+         fill="#7a4b25"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-split-value">Reshape value heads</text>
+      <text
+         x="1190"
+         y="503"
+         fill="#7a4b25"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-split-value">8 × 128</text>
+    </g>
+    <g
+       id="node-position"
+       inkscape:label="Token index">
+      <title
+         id="title43">Token index</title>
+      <rect
+         x="453.0"
+         y="559.0"
+         width="150"
+         height="42"
+         fill="#ffffff"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-position"
+         stroke-dasharray="4 3" />
+      <text
+         x="528"
+         y="586"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-position">Token index</text>
+    </g>
+    <g
+       id="node-phases"
+       inkscape:label="RoPE phases">
+      <title
+         id="title44">RoPE phases</title>
+      <rect
+         x="454.0"
+         y="679.0"
+         width="148"
+         height="42"
+         fill="#f0f4f5"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-phases" />
+      <text
+         x="528"
+         y="706"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-phases">RoPE phases</text>
+    </g>
+    <g
+       id="node-past-k"
+       inkscape:label="Past keys">
+      <title
+         id="title45">Past keys</title>
+      <rect
+         x="888.5"
+         y="682.0"
+         width="157"
+         height="42"
+         fill="#ffffff"
+         rx="8"
+         stroke="#80b2a6"
+         stroke-width="1.45"
+         id="box-past-k"
+         stroke-dasharray="4 3" />
+      <text
+         x="967"
+         y="709"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-past-k">Past keys</text>
+    </g>
+    <g
+       id="node-past-v"
+       inkscape:label="Past values">
+      <title
+         id="title46">Past values</title>
+      <rect
+         x="1369.5"
+         y="682.0"
+         width="161"
+         height="42"
+         fill="#ffffff"
+         rx="8"
+         stroke="#cca47d"
+         stroke-width="1.45"
+         id="box-past-v"
+         stroke-dasharray="4 3" />
+      <text
+         x="1450"
+         y="709"
+         fill="#7a4b25"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-past-v">Past values</text>
+    </g>
+    <g
+       id="node-join-k"
+       inkscape:label="Join key prefix">
+      <title
+         id="title47">Join key prefix · positions 0 through p</title>
+      <rect
+         x="655.0"
+         y="779.0"
+         width="210"
+         height="56"
+         fill="#ebf5f1"
+         rx="8"
+         stroke="#80b2a6"
+         stroke-width="1.45"
+         id="box-join-k" />
+      <text
+         x="760"
+         y="805"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-join-k">Join key prefix</text>
+      <text
+         x="760"
+         y="825"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-join-k">positions 0 through p</text>
+    </g>
+    <g
+       id="node-join-v"
+       inkscape:label="Join value prefix">
+      <title
+         id="title48">Join value prefix · positions 0 through p</title>
+      <rect
+         x="1082.5"
+         y="779.0"
+         width="215"
+         height="56"
+         fill="#fbf3e8"
+         rx="8"
+         stroke="#cca47d"
+         stroke-width="1.45"
+         id="box-join-v" />
+      <text
+         x="1190"
+         y="805"
+         fill="#7a4b25"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-join-v">Join value prefix</text>
+      <text
+         x="1190"
+         y="825"
+         fill="#7a4b25"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-join-v">positions 0 through p</text>
+    </g>
+    <g
+       id="node-select-k"
+       inkscape:label="Select KV head">
+      <title
+         id="title49">Select KV head</title>
+      <rect
+         x="655.0"
+         y="886.0"
+         width="210"
+         height="42"
+         fill="#ebf5f1"
+         rx="8"
+         stroke="#80b2a6"
+         stroke-width="1.45"
+         id="box-select-k" />
+      <text
+         x="760"
+         y="913"
+         fill="#1e5e55"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-select-k">Select KV head</text>
+    </g>
+    <g
+       id="node-select-v"
+       inkscape:label="Select KV head">
+      <title
+         id="title50">Select KV head</title>
+      <rect
+         x="1082.5"
+         y="886.0"
+         width="215"
+         height="42"
+         fill="#fbf3e8"
+         rx="8"
+         stroke="#cca47d"
+         stroke-width="1.45"
+         id="box-select-v" />
+      <text
+         x="1190"
+         y="913"
+         fill="#7a4b25"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-select-v">Select KV head</text>
+    </g>
+    <g
+       id="node-dot"
+       inkscape:label="Q · K dot product">
+      <title
+         id="title51">Q · K dot product</title>
+      <rect
+         x="205.0"
+         y="997.0"
+         width="174"
+         height="42"
+         fill="#f0f4f5"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-dot" />
+      <text
+         x="292"
+         y="1024"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-dot">Q · K dot product</text>
+    </g>
+    <g
+       id="node-scale"
+       inkscape:label="Scale scores">
+      <title
+         id="title52">Scale scores</title>
+      <rect
+         x="496.5"
+         y="997.0"
+         width="133"
+         height="42"
+         fill="#f0f4f5"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-scale" />
+      <text
+         x="563"
+         y="1024"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-scale">Scale scores</text>
+    </g>
+    <g
+       id="node-softmax"
+       inkscape:label="Softmax">
+      <title
+         id="title53">Softmax · over visible positions</title>
+      <rect
+         x="793.0"
+         y="990.0"
+         width="178"
+         height="56"
+         fill="#f0f4f5"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-softmax" />
+      <text
+         x="882"
+         y="1016"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-softmax">Softmax</text>
+      <text
+         x="882"
+         y="1036"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-softmax">over visible positions</text>
+    </g>
+    <g
+       id="node-mix"
+       inkscape:label="Weighted value sum">
+      <title
+         id="title54">Weighted value sum · one vector per query head</title>
+      <rect
+         x="1200.5"
+         y="990.0"
+         width="219"
+         height="56"
+         fill="#f0f4f5"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-mix" />
+      <text
+         x="1310"
+         y="1016"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-mix">Weighted value sum</text>
+      <text
+         x="1310"
+         y="1036"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-mix">one vector per query head</text>
+    </g>
+    <g
+       id="node-concat"
+       inkscape:label="Concatenate heads">
+      <title
+         id="title55">Concatenate heads · 32 × 128 → 4,096</title>
+      <rect
+         x="1206.5"
+         y="1097.0"
+         width="207"
+         height="56"
+         fill="#f0f4f5"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-concat" />
+      <text
+         x="1310"
+         y="1123"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-concat">Concatenate heads</text>
+      <text
+         x="1310"
+         y="1143"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-concat">32 × 128 → 4,096</text>
+    </g>
+    <g
+       id="node-out-proj"
+       inkscape:label="Output projection">
+      <title
+         id="title56">Output projection · 4,096 → 2,560</title>
+      <rect
+         x="650.5"
+         y="1097.0"
+         width="219"
+         height="56"
+         fill="#f0f4f5"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-out-proj" />
+      <text
+         x="760"
+         y="1123"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-out-proj">Output projection</text>
+      <text
+         x="760"
+         y="1143"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-out-proj">4,096 → 2,560</text>
+    </g>
+    <g
+       id="node-add-attn"
+       inkscape:label="Residual add">
+      <title
+         id="title57">Residual add</title>
+      <rect
+         x="194.0"
+         y="1104.0"
+         width="196"
+         height="42"
+         fill="#f0f4f5"
+         rx="8"
+         stroke="#879ca6"
+         stroke-width="1.45"
+         id="box-add-attn" />
+      <text
+         x="292"
+         y="1131"
+         fill="#233d48"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-add-attn">Residual add</text>
+    </g>
+    <g
+       id="node-norm-ff"
+       inkscape:label="Post-attention RMSNorm">
+      <title
+         id="title58">Post-attention RMSNorm · across 2,560 features</title>
+      <rect
+         x="162.5"
+         y="1352.0"
+         width="259"
+         height="56"
+         fill="#f5f1f8"
+         rx="8"
+         stroke="#b7a0c8"
+         stroke-width="1.45"
+         id="box-norm-ff" />
+      <text
+         x="292"
+         y="1378"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-norm-ff">Post-attention RMSNorm</text>
+      <text
+         x="292"
+         y="1398"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-norm-ff">across 2,560 features</text>
+    </g>
+    <g
+       id="node-gate"
+       inkscape:label="Gate projection">
+      <title
+         id="title59">Gate projection · 2,560 → 9,728</title>
+      <rect
+         x="570.0"
+         y="1280.0"
+         width="200"
+         height="56"
+         fill="#f5f1f8"
+         rx="8"
+         stroke="#b7a0c8"
+         stroke-width="1.45"
+         id="box-gate" />
+      <text
+         x="670"
+         y="1306"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-gate">Gate projection</text>
+      <text
+         x="670"
+         y="1326"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-gate">2,560 → 9,728</text>
+    </g>
+    <g
+       id="node-up"
+       inkscape:label="Up projection">
+      <title
+         id="title60">Up projection · 2,560 → 9,728</title>
+      <rect
+         x="570.0"
+         y="1410.0"
+         width="200"
+         height="56"
+         fill="#f5f1f8"
+         rx="8"
+         stroke="#b7a0c8"
+         stroke-width="1.45"
+         id="box-up" />
+      <text
+         x="670"
+         y="1436"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-up">Up projection</text>
+      <text
+         x="670"
+         y="1456"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-up">2,560 → 9,728</text>
+    </g>
+    <g
+       id="node-silu"
+       inkscape:label="SiLU">
+      <title
+         id="title61">SiLU</title>
+      <rect
+         x="928.5"
+         y="1287.0"
+         width="153"
+         height="42"
+         fill="#f5f1f8"
+         rx="8"
+         stroke="#b7a0c8"
+         stroke-width="1.45"
+         id="box-silu" />
+      <text
+         x="1005"
+         y="1314"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-silu">SiLU</text>
+    </g>
+    <g
+       id="node-mul"
+       inkscape:label="Elementwise multiply">
+      <title
+         id="title62">Elementwise multiply</title>
+      <rect
+         x="1242.0"
+         y="1359.0"
+         width="220"
+         height="42"
+         fill="#f5f1f8"
+         rx="8"
+         stroke="#b7a0c8"
+         stroke-width="1.45"
+         id="box-mul" />
+      <text
+         x="1352"
+         y="1386"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-mul">Elementwise multiply</text>
+    </g>
+    <g
+       id="node-down"
+       inkscape:label="Down projection">
+      <title
+         id="title63">Down projection · 9,728 → 2,560</title>
+      <rect
+         x="1242.0"
+         y="1512.0"
+         width="220"
+         height="56"
+         fill="#f5f1f8"
+         rx="8"
+         stroke="#b7a0c8"
+         stroke-width="1.45"
+         id="box-down" />
+      <text
+         x="1352"
+         y="1538"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-down">Down projection</text>
+      <text
+         x="1352"
+         y="1558"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-down">9,728 → 2,560</text>
+    </g>
+    <g
+       id="node-add-ff"
+       inkscape:label="Residual add">
+      <title
+         id="title64">Residual add</title>
+      <rect
+         x="640.0"
+         y="1519.0"
+         width="196"
+         height="42"
+         fill="#f5f1f8"
+         rx="8"
+         stroke="#b7a0c8"
+         stroke-width="1.45"
+         id="box-add-ff" />
+      <text
+         x="738"
+         y="1546"
+         fill="#59416e"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-add-ff">Residual add</text>
+    </g>
+    <g
+       id="node-output"
+       inkscape:label="Layer output">
+      <title
+         id="title65">Layer output · 2,560 features</title>
+      <rect
+         x="197.0"
+         y="1512.0"
+         width="190"
+         height="56"
+         fill="#172e38"
+         rx="8"
+         stroke="#172e38"
+         stroke-width="1.45"
+         id="box-output" />
+      <text
+         x="292"
+         y="1538"
+         fill="#ffffff"
+         text-anchor="middle"
+         font-size="17"
+         font-family="Verdana"
+         font-weight="600"
+         letter-spacing="-0.35"
+         id="name-output">Layer output</text>
+      <text
+         x="292"
+         y="1558"
+         fill="#dce8e9"
+         text-anchor="middle"
+         font-size="14"
+         font-family="Verdana"
+         font-weight="400"
+         id="sub-output">2,560 features</text>
+    </g>
+  </g>
+  <g
+     id="equations"
+     inkscape:groupmode="layer"
+     inkscape:label="Edge equations">
+    <text
+       x="516"
+       y="248"
+       fill="#233d48"
+       text-anchor="middle"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-input--norm-in">x = x<tspan
+   baseline-shift="super"
+   font-size="14.91"
+   id="tspan65">(ℓ)</tspan>[p]</text>
+    <text
+       x="85"
+       y="1073"
+       fill="#233d48"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-input--add-attn">x = x<tspan
+   baseline-shift="super"
+   font-size="14.91"
+   id="tspan66">(ℓ)</tspan>[p]</text>
+    <text
+       x="495"
+       y="308"
+       fill="#224e79"
+       text-anchor="middle"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-norm-in--proj-query">z = N(x, γ<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan67">in</tspan>)</text>
+    <text
+       x="305"
+       y="442"
+       fill="#224e79"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-proj-query--split-query">Q = W<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan68">Q</tspan> z</text>
+    <text
+       x="305"
+       y="545"
+       fill="#224e79"
+       text-anchor="start"
+       font-size="19"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-split-query--norm-query">q<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan69">h,j</tspan> = Q<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan70">128h+j</tspan></text>
+    <text
+       x="305"
+       y="654"
+       fill="#224e79"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-norm-query--rope-query">q′<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan71">h</tspan> = N(q<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan72">h</tspan>, γ<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan73">Q</tspan>)</text>
+    <text
+       x="774"
+       y="345"
+       fill="#1e5e55"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-norm-in--proj-key">z = N(x, γ<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan74">in</tspan>)</text>
+    <text
+       x="773"
+       y="442"
+       fill="#1e5e55"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-proj-key--split-key">K = W<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan75">K</tspan> z</text>
+    <text
+       x="773"
+       y="545"
+       fill="#1e5e55"
+       text-anchor="start"
+       font-size="19"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-split-key--norm-key">k<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan76">g,j</tspan> = K<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan77">128g+j</tspan></text>
+    <text
+       x="773"
+       y="654"
+       fill="#1e5e55"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-norm-key--rope-key">k′<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan78">g</tspan> = N(k<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan79">g</tspan>, γ<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan80">K</tspan>)</text>
+    <text
+       x="1009"
+       y="308"
+       fill="#7a4b25"
+       text-anchor="middle"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-norm-in--proj-value">z = N(x, γ<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan81">in</tspan>)</text>
+    <text
+       x="1203"
+       y="442"
+       fill="#7a4b25"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-proj-value--split-value">V = W<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan82">V</tspan> z</text>
+    <text
+       x="542"
+       y="645"
+       fill="#233d48"
+       text-anchor="start"
+       font-size="18"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-position--phases">p = |K<tspan
+   baseline-shift="super"
+   font-size="12.78"
+   id="tspan83">−</tspan>|</text>
+    <text
+       x="410"
+       y="686"
+       fill="#233d48"
+       text-anchor="middle"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-phases--rope-query">θ = pω</text>
+    <text
+       x="646"
+       y="686"
+       fill="#233d48"
+       text-anchor="middle"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-phases--rope-key">θ = pω</text>
+    <text
+       x="306"
+       y="862"
+       fill="#224e79"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-rope-query--dot">q<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan84">p,h</tspan> = R<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan85">θ</tspan>(q′<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan86">h</tspan>)</text>
+    <text
+       x="774"
+       y="762"
+       fill="#1e5e55"
+       text-anchor="start"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-rope-key--join-k">k<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan87">p,g</tspan> = R<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan88">θ</tspan>(k′<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan89">g</tspan>)</text>
+    <text
+       x="1204"
+       y="604"
+       fill="#7a4b25"
+       text-anchor="start"
+       font-size="19"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-split-value--join-v">v<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan90">p,g,j</tspan> = V<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan91">128g+j</tspan></text>
+    <text
+       x="982"
+       y="768"
+       fill="#1e5e55"
+       text-anchor="start"
+       font-size="19"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-past-k--join-k">K<tspan
+   baseline-shift="super"
+   font-size="13.49"
+   id="tspan92">−</tspan> = (k<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan93">t</tspan>)<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan94">t&lt;p</tspan></text>
+    <text
+       x="1463"
+       y="768"
+       fill="#7a4b25"
+       text-anchor="start"
+       font-size="19"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-past-v--join-v">V<tspan
+   baseline-shift="super"
+   font-size="13.49"
+   id="tspan95">−</tspan> = (v<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan96">t</tspan>)<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan97">t&lt;p</tspan></text>
+    <text
+       x="774"
+       y="865"
+       fill="#1e5e55"
+       text-anchor="start"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-join-k--select-k">K<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan98">≤p</tspan> = concat(K<tspan
+   baseline-shift="super"
+   font-size="14.2"
+   id="tspan99">−</tspan>, k<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan100">p</tspan>)</text>
+    <text
+       x="1204"
+       y="865"
+       fill="#7a4b25"
+       text-anchor="start"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-join-v--select-v">V<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan101">≤p</tspan> = concat(V<tspan
+   baseline-shift="super"
+   font-size="14.2"
+   id="tspan102">−</tspan>, v<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan103">p</tspan>)</text>
+    <text
+       x="448"
+       y="892"
+       fill="#1e5e55"
+       text-anchor="start"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-select-k--dot">κ<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan104">h,t</tspan> = K<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan105">≤p</tspan>[t, ⌊h/4⌋]</text>
+    <text
+       x="1343"
+       y="953"
+       fill="#7a4b25"
+       text-anchor="start"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-select-v--mix">ν<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan106">h,t</tspan> = V<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan107">≤p</tspan>[t, ⌊h/4⌋]</text>
+    <text
+       x="438"
+       y="981"
+       fill="#233d48"
+       text-anchor="middle"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-dot--scale">d<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan108">h,t</tspan> = ⟨q<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan109">p,h</tspan>, κ<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan110">h,t</tspan>⟩</text>
+    <text
+       x="711"
+       y="981"
+       fill="#233d48"
+       text-anchor="middle"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-scale--softmax">s<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan111">h,t</tspan> = d<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan112">h,t</tspan> / √128</text>
+    <text
+       x="1082"
+       y="989"
+       fill="#233d48"
+       text-anchor="middle"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-softmax--mix">α<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan113">h,t</tspan> = exp(s<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan114">h,t</tspan>) / Z<tspan
+   baseline-shift="sub"
+   font-size="14.2"
+   id="tspan115">h</tspan></text>
+    <text
+       x="1324"
+       y="1080"
+       fill="#233d48"
+       text-anchor="start"
+       font-size="22"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-mix--concat">c<tspan
+   baseline-shift="sub"
+   font-size="15.62"
+   id="tspan116">h</tspan> = ∑<tspan
+   baseline-shift="sub"
+   font-size="15.62"
+   id="tspan117">0≤t≤p</tspan> α<tspan
+   baseline-shift="sub"
+   font-size="15.62"
+   id="tspan118">h,t</tspan> ν<tspan
+   baseline-shift="sub"
+   font-size="15.62"
+   id="tspan119">h,t</tspan></text>
+    <text
+       x="1030"
+       y="1113"
+       fill="#233d48"
+       text-anchor="middle"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-concat--out-proj">c = concat(c<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan120">0</tspan>, …, c<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan121">31</tspan>)</text>
+    <text
+       x="518"
+       y="1113"
+       fill="#233d48"
+       text-anchor="middle"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-out-proj--add-attn">o = W<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan122">O</tspan> c</text>
+    <text
+       x="307"
+       y="1285"
+       fill="#233d48"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-add-attn--norm-ff">r = x + o</text>
+    <text
+       x="455"
+       y="1584"
+       fill="#233d48"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-add-attn--add-ff">r = x + o</text>
+    <text
+       x="518"
+       y="1268"
+       fill="#59416e"
+       text-anchor="middle"
+       font-size="19"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-norm-ff--gate">m = N(r, γ<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan123">post</tspan>)</text>
+    <text
+       x="518"
+       y="1399"
+       fill="#59416e"
+       text-anchor="middle"
+       font-size="19"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-norm-ff--up">m = N(r, γ<tspan
+   baseline-shift="sub"
+   font-size="13.49"
+   id="tspan124">post</tspan>)</text>
+    <text
+       x="848"
+       y="1292"
+       fill="#59416e"
+       text-anchor="middle"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-gate--silu">a = W<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan125">gate</tspan> m</text>
+    <text
+       x="1214"
+       y="1292"
+       fill="#59416e"
+       text-anchor="middle"
+       font-size="20"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-silu--mul">f = a / (1 + exp(−a))</text>
+    <text
+       x="959"
+       y="1424"
+       fill="#59416e"
+       text-anchor="middle"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-up--mul">u = W<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan126">up</tspan> m</text>
+    <text
+       x="1366"
+       y="1467"
+       fill="#59416e"
+       text-anchor="start"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-mul--down">s = f ⊙ u</text>
+    <text
+       x="1038"
+       y="1527"
+       fill="#59416e"
+       text-anchor="middle"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-down--add-ff">b = W<tspan
+   baseline-shift="sub"
+   font-size="14.91"
+   id="tspan127">down</tspan> s</text>
+    <text
+       x="510"
+       y="1527"
+       fill="#233d48"
+       text-anchor="middle"
+       font-size="21"
+       font-family="STIX Two Math"
+       font-weight="400"
+       id="eq-add-ff--output">x<tspan
+   baseline-shift="super"
+   font-size="14.91"
+   id="tspan128">(ℓ+1)</tspan>[p] = r + b</text>
+  </g>
+</svg>

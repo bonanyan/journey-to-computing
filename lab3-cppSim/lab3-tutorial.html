@@ -282,6 +282,23 @@
         -webkit-print-color-adjust: exact;
       }
     }
+
+    .tutorial-header .tutorial-logo {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto 1rem;
+    }
+
+    .tutorial-header h1 {
+      margin: 0 0 0.75rem;
+    }
+
+    .tutorial-header .tutorial-byline {
+      margin: 0;
+      text-align: center;
+      font-size: 0.95em;
+    }
   </style>
   <script type="text/plain" id="font-licenses">
 PT Sans font license
@@ -477,11 +494,19 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 </head>
 <body>
 <main>
-<h1 id="lab3--write-a-c-simulator-for-a-cim-array-and-lab-2s-cpupim-system">Lab3 · Write a C++ simulator for a CIM array and Lab 2’s CPU–PIM system</h1>
+<header class="tutorial-header">
+  <img class="tutorial-logo" src="../assets/journey-computing-jc_v2.png" alt="Journey to Computing logo" width="144" height="86" />
+  <h1 id="lab3--write-a-c-simulator-for-a-cim-array-and-lab-2s-cpupim-system">Lab3 · Write a C++ simulator for a CIM array and Lab 2’s CPU–PIM system</h1>
+  <p class="tutorial-byline"><strong>Author:</strong> Dr. Bonan Yan (<a href="mailto:bonanyan@pku.edu.cn">bonanyan@pku.edu.cn</a>) · <time datetime="2026-11-22">November 22, 2026</time></p>
+</header>
+<h2 id="what-to-do">What to do</h2>
 <p>In Lab 2, you ran RISC-V firmware on the X-HEEP RTL and watched lane 31 produce 335. In this lab you will write the C++ that predicts that result and the clock edge when the CPU can read it. Start in Step 1 with a standalone computing-in-memory (CIM) array that sums products down each column. In Step 2, model Lab 2’s digital PIM (DPIM) macro, where each of 32 lanes produces its own 32-bit result. Run the same firmware on both implementations and compare their Open Bus Interface (OBI) transactions. <a href="../lab2-CPU+PIM/lab2-tutorial.html">Lab 2 tutorial</a></p>
-<p>Run the examples from the directory containing the Makefile with GNU Make and a C++17 compiler. Each step has its own build-and-run target.</p>
+<h2 id="how-to-run">How to run</h2>
+<p>Run the examples from the directory containing the Makefile with GNU Make and a C++17 compiler. Run the standalone CIM array first, then run the bundled Lab 2 firmware images and trace the row-switch benchmark.</p>
+<pre class="sh"><code>make run-cim
+make run-cpu-cim
+./build/cosim examples/lab2/row_switch.hex --trace</code></pre>
 <h2 id="step-1-simulate-the-cim-array-on-its-own">Step 1. Simulate the CIM array on its own</h2>
-<pre class="sh"><code>make run-cim</code></pre>
 <p>The standalone driver reads three sizes from a workload file, programs one weight matrix, and runs each input vector against those weights. The example contains three rows, two columns, and two vectors. <a href="./examples/example.cim">Workload</a> · <a href="./simulators/cim.cpp">Standalone driver</a></p>
 <pre class="text"><code>3 2 2
 1 -2
@@ -538,8 +563,6 @@ for (std::size_t r = 0; r &lt; rows_; ++r) {
 <p>To check weight reuse yourself, copy the workload, change the vector count from two to three, and append the vector <code>1 0 0</code>. Run <code>./build/cim</code> with the edited file as its argument. The new vector selects the first row of weights, giving <code>1 -2</code>. The total should rise from 25 to 36 cycles.</p>
 <h2 id="step-2-model-lab-2s-risc-v-cpu-and-digital-pim-peripheral-in-c">Step 2. Model Lab 2's RISC-V CPU and digital PIM peripheral in C++</h2>
 <p>Start with the program you ran in Lab 2. In <code>row_switch.S</code>, the CPU programs two weights in lane 31, first addresses row 0, then row 127, then returns to row 0. Run the four Lab 2 firmware images and trace this one in detail. The bundled images contain the assembled instructions and data used by the RTL testbench. This step needs only the host C++ compiler and Make. <a href="../lab2-CPU+PIM/design/sw/benchmarks/row_switch.S">Assembly source</a> · <a href="./examples/lab2/">Firmware images</a></p>
-<pre class="sh"><code>make run-cpu-cim
-./build/cosim examples/lab2/row_switch.hex --trace</code></pre>
 <h3 id="start-with-the-cpus-load-and-store-addresses">Start with the CPU's load and store addresses</h3>
 <p>Load the hex image into 128 KiB of SRAM. Set the program counter to the linked entry point, <code>0x180</code>. Fetch the first 16 bits. If the low two bits are both one, fetch the next halfword to complete a 32-bit instruction. The instruction model executes the RV32IMC subset used by the lab firmware, including the branches in its polling and result-checking loops. At the end, the startup code writes the return value to <code>0x20000004</code> and asserts exit-valid at <code>0x20000000</code>. This gives each benchmark its own pass or failure code. <a href="./simulators/rv32.hpp">CPU model</a> · <a href="./simulators/lab2_system.hpp">SRAM and address decoder</a> · <a href="../lab2-CPU+PIM/design/sw/start.S">Lab 2 startup</a></p>
 <p>Route a data access in the 32 KiB window starting at <code>0xC0030000</code> to the DPIM wrapper. The C++ address decoder stands in for X-HEEP's bus demultiplexer and external crossbar. For a naturally aligned load or store, the CPU sends a word-aligned bus address and a four-bit byte enable. A word selects all four bytes. A byte at offset 2 selects <code>be=0x4</code>. <a href="../lab2-CPU+PIM/design/sw/dpim.h">Lab 2 register definitions</a> · <a href="../lab2-CPU+PIM/design/rtl/dpim_obi.sv">RTL wrapper</a></p>

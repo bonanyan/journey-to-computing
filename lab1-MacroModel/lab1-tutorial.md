@@ -1,10 +1,20 @@
+<p align="center">
+  <img src="../assets/journey-computing-jc_v2.png" alt="Journey to Computing logo" width="144" height="86" />
+</p>
+
 # Lab 1 · Simulate a processing-in-memory macro
+
+<p align="center">
+  <strong>Author:</strong> Dr. Bonan Yan (<a href="mailto:bonanyan@pku.edu.cn">bonanyan@pku.edu.cn</a>) · November 22, 2026
+</p>
+
+## What to do
 
 What can you get back from a memory array on one rising clock edge? Start with a single 32-bit read (MEM). Then use the same digital processing-in-memory macro (DPIM) to operate on 32 stored words in parallel. Finally, program a 4 × 8 weight matrix into an analog processing-in-memory macro (APIM) and watch eight dot products become six-bit output codes.
 
 The supplied PISLIB has two RTL modules. MEM uses the scalar port on `DPIM`. APIM uses `Basic_GeMM_CIM`, an unsigned integer model of an ideal analog multiply–accumulate and analog-to-digital converter (ADC). Each trace shows the clock edges visible to a macro user. The 10 ns testbench clock is a stimulus setting. [Digital RTL](pislib_verilog-main/src/DPIM.v) · [Analog RTL](pislib_verilog-main/src/APIM.v)
 
-## Build and run
+## How to run
 
 Use Verilator 5 with timing support, a C++20 compiler with coroutines, GNU Make, and GTKWave. On Ubuntu 24.04, for example, install them with `sudo apt install build-essential verilator gtkwave`. From the directory containing this tutorial, run the following commands.
 

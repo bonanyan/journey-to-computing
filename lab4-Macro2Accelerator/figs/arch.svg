@@ -1,0 +1,278 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" width="1500" height="1194" viewBox="0 0 1500 1194" version="1.1" role="img" aria-labelledby="figure-title figure-description" id="svg84" sodipodi:docname="arch.svg">
+  <title id="figure-title">MPU architecture with four ACIM arrays and eight planned DarkRISCV processor cores</title>
+  <desc id="figure-description">A CPU submits commands and activations through MMIO. A four-entry command FIFO feeds a sequencer. A weight tile buffer loads external packed weights. Four Lab 1 ACIM macros process shared activations, producing 32 ADC codes that digital accumulators turn into signed INT32 results. Result memory feeds MMIO readback. The planned programmable vector processing unit sits inside the MPU after projection writeback. The sequencer launches a kernel dispatcher. Eight DarkRISCV cores with private program counters fetch shared kernel code and access banked tensor memory.</desc>
+  <defs id="defs2">
+    <marker id="arrow-data" viewBox="0 0 10 10" refX="9.4" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M 0,0 10,5 0,10 Z" fill="#254a60" id="path1"/>
+    </marker>
+    <marker id="arrow-control" viewBox="0 0 10 10" refX="9.4" refY="5" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M 0,0 10,5 0,10 Z" fill="#21716d" id="path2"/>
+    </marker>
+  </defs>
+  <sodipodi:namedview id="namedview1" inkscape:document-units="px" pagecolor="#ffffff" bordercolor="#666666" borderopacity="0.25" inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1"/>
+  <rect id="background" width="1500.0" height="1194" x="0" y="0" style="fill:#ffffff;stroke:none"/>
+  <g id="frame" inkscape:groupmode="layer" inkscape:label="Figure and MPU boundary">
+    <text x="44" y="59" fill="#173449" font-size="47" font-weight="bold" font-family="Verdana, sans-serif" id="text2">MPU architecture</text>
+    <text x="46" y="94" fill="#455c6a" font-size="23" font-weight="normal" font-family="Verdana, sans-serif" id="text3">Four-array INT4 projection engine and eight DarkRISCV vector lanes</text>
+    <path d="M46 114 H1452" fill="none" stroke="#c2cdd1" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" id="path3"/>
+    <rect x="307" y="140" width="1146" height="1022" rx="12" fill="#ffffff" stroke="#748c98" stroke-width="1.9" id="rect3"/>
+    <text x="333" y="172" fill="#173449" font-size="18" font-weight="bold" font-family="Verdana, sans-serif" id="text4">MPU   ·   Stage 1 projection datapath</text>
+    <text x="45" y="173" fill="#455c6a" font-size="20" font-weight="bold" font-family="Verdana, sans-serif" id="text5">External interfaces</text>
+    <path d="M1042 75 h43" fill="none" stroke="#254a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)" id="path5"/>
+    <text x="1096" y="81" fill="#455c6a" font-size="18" font-weight="normal" font-family="Verdana, sans-serif" id="text6">Data</text>
+    <path d="M1198 75 h43" fill="none" stroke="#21716d" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-control)" stroke-dasharray="6 5" id="path6"/>
+    <text x="1252" y="81" fill="#455c6a" font-size="18" font-weight="normal" font-family="Verdana, sans-serif" id="text7">Control / status</text>
+  </g>
+  <g id="wires" inkscape:groupmode="layer" inkscape:label="Data paths and control signals">
+    <path d="M232 254 H350" fill="none" stroke="#254a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)" marker-start="url(#arrow-data)" id="path7"/>
+    <path d="M546 238 H608" fill="none" stroke="#21716d" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-control)" stroke-dasharray="6 5" id="path8"/>
+    <path d="M825 238 H920" fill="none" stroke="#21716d" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-control)" stroke-dasharray="6 5" id="path9"/>
+    <path d="M1170 208 V184 H506 V208" fill="none" stroke="#21716d" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-control)" stroke-dasharray="6 5" id="path10"/>
+    <text x="798" y="177" fill="#21716d" font-size="16" font-weight="normal" font-family="Verdana, sans-serif" id="text10">Status and retired-command PC</text>
+    <path d="M430 295 V342" fill="none" stroke="#254a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)" id="path11"/>
+    <path d="M560 379 H690" fill="none" stroke="#254a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)" id="path12"/>
+    <text x="583" y="369" fill="#254a60" font-size="17" font-weight="normal" font-family="Verdana, sans-serif" id="text12">Broadcast</text>
+    <path d="M560 533 H690" fill="none" stroke="#254a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)" id="path13"/>
+    <text x="588" y="524" fill="#254a60" font-size="17" font-weight="normal" font-family="Verdana, sans-serif" id="text13">Program</text>
+    <path d="M970 295 V356" fill="none" stroke="#21716d" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-control)" stroke-dasharray="6 5" id="path14"/>
+    <text x="986" y="326" fill="#21716d" font-size="16" font-weight="normal" font-family="Verdana, sans-serif" id="text14">Plane select and enables</text>
+    <path d="M1058 454 H1140" fill="none" stroke="#254a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)" id="path15"/>
+    <text x="1067" y="442" fill="#254a60" font-size="16" font-weight="normal" font-family="Verdana, sans-serif" id="text15">32 × 6b</text>
+    <path d="M1268 518 V618" fill="none" stroke="#254a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)" id="path16"/>
+    <text x="1281" y="560" fill="#254a60" font-size="16" font-weight="normal" font-family="Verdana, sans-serif" id="text16">INT32</text>
+    <text x="1281" y="582" fill="#254a60" font-size="16" font-weight="normal" font-family="Verdana, sans-serif" id="text17">writeback</text>
+    <path d="M1140 664 H328 V280 H350" fill="none" stroke="#254a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)" id="path17"/>
+    <text x="678" y="688" fill="#254a60" font-size="17" font-weight="normal" font-family="Verdana, sans-serif" id="text18">Output reads via MMIO</text>
+    <path d="M317 537 H338" fill="none" stroke="#ffffff" stroke-width="8" stroke-linejoin="round" stroke-linecap="round" id="path18"/>
+    <path d="M232 537 H350" fill="none" stroke="#254a60" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)" id="path19"/>
+    <text x="246" y="524" fill="#254a60" font-size="16" font-weight="normal" font-family="Verdana, sans-serif" id="text19">Bytes</text>
+  </g>
+  <g id="blocks" inkscape:groupmode="layer" inkscape:label="Interfaces, buffers and control">
+    <g id="cpu" inkscape:label="Host CPU">
+      <rect x="44" y="210" width="188" height="87" rx="6" fill="#f1f4f6" stroke="#254a60" stroke-width="1.5" id="rect19"/>
+      <text x="61" y="241" fill="#254a60" font-size="23" font-weight="bold" font-family="Verdana, sans-serif" id="text20">Host CPU</text>
+      <text x="61" y="268" fill="#455c6a" font-size="17" font-weight="normal" font-family="Verdana, sans-serif" id="text21">pim_linear_i4</text>
+    </g>
+    <g id="external-memory" inkscape:label="Weight memory">
+      <rect x="44" y="490" width="188" height="93" rx="6" fill="#f1f4f6" stroke="#254a60" stroke-width="1.5" id="rect21"/>
+      <text x="61" y="521" fill="#254a60" font-size="19" font-weight="bold" font-family="Verdana, sans-serif" id="text22">Weight memory</text>
+      <text x="61" y="548" fill="#455c6a" font-size="14.5" font-weight="normal" font-family="Verdana, sans-serif" id="text23">Packed INT4 W[N,K]</text>
+    </g>
+    <g id="mmio" inkscape:label="MMIO interface">
+      <rect x="350" y="208" width="196" height="87" rx="6" fill="#f3f7f9" stroke="#254a60" stroke-width="1.5" id="rect23"/>
+      <text x="367" y="239" fill="#254a60" font-size="19.5" font-weight="bold" font-family="Verdana, sans-serif" id="text24">MMIO interface</text>
+      <text x="367" y="266" fill="#455c6a" font-size="14.5" font-weight="normal" font-family="Verdana, sans-serif" id="text25">32-bit load / store</text>
+    </g>
+    <g id="fifo" inkscape:label="Command FIFO">
+      <rect x="608" y="208" width="217" height="87" rx="6" fill="#f1f8f7" stroke="#21716d" stroke-width="1.5" id="rect25"/>
+      <text x="625" y="239" fill="#21716d" font-size="21" font-weight="bold" font-family="Verdana, sans-serif" id="text26">Command FIFO</text>
+      <text x="625" y="266" fill="#455c6a" font-size="17" font-weight="normal" font-family="Verdana, sans-serif" id="text27">4 × 32-bit entries</text>
+    </g>
+    <g id="sequencer" inkscape:label="Decoder and sequencer">
+      <rect x="920" y="208" width="482" height="87" rx="6" fill="#f1f8f7" stroke="#21716d" stroke-width="1.5" id="rect27"/>
+      <text x="937" y="239" fill="#21716d" font-size="23" font-weight="bold" font-family="Verdana, sans-serif" id="text28">Decoder and sequencer</text>
+      <text x="937" y="266" fill="#455c6a" font-size="16" font-weight="normal" font-family="Verdana, sans-serif" id="text29">LINEAR / END   ·   tile and bit-plane counters</text>
+    </g>
+    <g id="activations" inkscape:label="Activation buffer">
+      <rect x="350" y="342" width="210" height="84" rx="6" fill="#f3f7f9" stroke="#254a60" stroke-width="1.5" id="rect29"/>
+      <text x="367" y="373" fill="#254a60" font-size="17.5" font-weight="bold" font-family="Verdana, sans-serif" id="text30">Activation buffer</text>
+      <text x="367" y="400" fill="#455c6a" font-size="15" font-weight="normal" font-family="Verdana, sans-serif" id="text31">8 INT4 inputs / word</text>
+    </g>
+    <g id="weights" inkscape:label="Weight tile buffer">
+      <rect x="350" y="490" width="210" height="93" rx="6" fill="#f3f7f9" stroke="#254a60" stroke-width="1.5" id="rect31"/>
+      <text x="367" y="521" fill="#254a60" font-size="16.5" font-weight="bold" font-family="Verdana, sans-serif" id="text32">Weight tile buffer</text>
+      <text x="367" y="548" fill="#455c6a" font-size="13.5" font-weight="normal" font-family="Verdana, sans-serif" id="text33">64 B   ·   4 × 32 INT4</text>
+    </g>
+    <g id="acim-bank" inkscape:label="Four Lab 1 ACIM macros">
+      <rect x="690" y="356" width="368" height="258" rx="9" fill="#fff9f3" stroke="#a6673e" stroke-width="1.8" id="rect33"/>
+      <text x="710" y="391" fill="#914b29" font-size="26" font-weight="bold" font-family="Verdana, sans-serif" id="text34">ACIM macro bank</text>
+      <text x="710" y="419" fill="#674b39" font-size="15" font-weight="normal" font-family="Verdana, sans-serif" id="text35">4 shared inputs × 8 outputs per macro</text>
+      <g id="acim-0" inkscape:label="ACIM macro 0">
+        <rect x="710" y="437" width="158" height="67" rx="5" fill="#fffefd" stroke="#cc9a75" stroke-width="1.25" id="rect35"/>
+        <rect x="719" y="458" width="35.2" height="22" rx="0" fill="#fae5d2" stroke="#b6774e" stroke-width="1" id="rect36"/>
+        <path d="M723.4 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path36"/>
+        <path d="M727.8 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path37"/>
+        <path d="M732.2 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path38"/>
+        <path d="M736.6 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path39"/>
+        <path d="M741.0 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path40"/>
+        <path d="M745.4 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path41"/>
+        <path d="M749.8 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path42"/>
+        <path d="M719 463.5h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path43"/>
+        <path d="M719 469.0h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path44"/>
+        <path d="M719 474.5h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path45"/>
+        <text x="765" y="466" fill="#914b29" font-size="20" font-weight="bold" font-family="Verdana, sans-serif" id="text45">ACIM 0</text>
+        <text x="765" y="487" fill="#674b39" font-size="15" font-weight="normal" font-family="Verdana, sans-serif" id="text46">Lanes 0–7</text>
+      </g>
+      <g id="acim-1" inkscape:label="ACIM macro 1">
+        <rect x="879" y="437" width="158" height="67" rx="5" fill="#fffefd" stroke="#cc9a75" stroke-width="1.25" id="rect46"/>
+        <rect x="888" y="458" width="35.2" height="22" rx="0" fill="#fae5d2" stroke="#b6774e" stroke-width="1" id="rect47"/>
+        <path d="M892.4 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path47"/>
+        <path d="M896.8 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path48"/>
+        <path d="M901.2 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path49"/>
+        <path d="M905.6 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path50"/>
+        <path d="M910.0 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path51"/>
+        <path d="M914.4 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path52"/>
+        <path d="M918.8 458v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path53"/>
+        <path d="M888 463.5h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path54"/>
+        <path d="M888 469.0h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path55"/>
+        <path d="M888 474.5h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path56"/>
+        <text x="934" y="466" fill="#914b29" font-size="20" font-weight="bold" font-family="Verdana, sans-serif" id="text56">ACIM 1</text>
+        <text x="934" y="487" fill="#674b39" font-size="15" font-weight="normal" font-family="Verdana, sans-serif" id="text57">Lanes 8–15</text>
+      </g>
+      <g id="acim-2" inkscape:label="ACIM macro 2">
+        <rect x="710" y="519" width="158" height="67" rx="5" fill="#fffefd" stroke="#cc9a75" stroke-width="1.25" id="rect57"/>
+        <rect x="719" y="540" width="35.2" height="22" rx="0" fill="#fae5d2" stroke="#b6774e" stroke-width="1" id="rect58"/>
+        <path d="M723.4 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path58"/>
+        <path d="M727.8 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path59"/>
+        <path d="M732.2 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path60"/>
+        <path d="M736.6 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path61"/>
+        <path d="M741.0 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path62"/>
+        <path d="M745.4 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path63"/>
+        <path d="M749.8 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path64"/>
+        <path d="M719 545.5h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path65"/>
+        <path d="M719 551.0h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path66"/>
+        <path d="M719 556.5h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path67"/>
+        <text x="765" y="548" fill="#914b29" font-size="20" font-weight="bold" font-family="Verdana, sans-serif" id="text67">ACIM 2</text>
+        <text x="765" y="569" fill="#674b39" font-size="14" font-weight="normal" font-family="Verdana, sans-serif" id="text68">Lanes 16–23</text>
+      </g>
+      <g id="acim-3" inkscape:label="ACIM macro 3">
+        <rect x="879" y="519" width="158" height="67" rx="5" fill="#fffefd" stroke="#cc9a75" stroke-width="1.25" id="rect68"/>
+        <rect x="888" y="540" width="35.2" height="22" rx="0" fill="#fae5d2" stroke="#b6774e" stroke-width="1" id="rect69"/>
+        <path d="M892.4 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path69"/>
+        <path d="M896.8 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path70"/>
+        <path d="M901.2 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path71"/>
+        <path d="M905.6 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path72"/>
+        <path d="M910.0 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path73"/>
+        <path d="M914.4 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path74"/>
+        <path d="M918.8 540v22" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path75"/>
+        <path d="M888 545.5h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path76"/>
+        <path d="M888 551.0h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path77"/>
+        <path d="M888 556.5h35.2" fill="none" stroke="#b6774e" stroke-width="0.65" stroke-linejoin="round" stroke-linecap="round" id="path78"/>
+        <text x="934" y="548" fill="#914b29" font-size="20" font-weight="bold" font-family="Verdana, sans-serif" id="text78">ACIM 3</text>
+        <text x="934" y="569" fill="#674b39" font-size="14" font-weight="normal" font-family="Verdana, sans-serif" id="text79">Lanes 24–31</text>
+      </g>
+    </g>
+    <g id="accumulate" inkscape:label="Shift and accumulate">
+      <rect x="1140" y="404" width="262" height="114" rx="6" fill="#f3f7f9" stroke="#254a60" stroke-width="1.5" id="rect79"/>
+      <text x="1157" y="435" fill="#254a60" font-size="19" font-weight="bold" font-family="Verdana, sans-serif" id="text80">Shift and accumulate</text>
+      <text x="1157" y="462" fill="#455c6a" font-size="14" font-weight="normal" font-family="Verdana, sans-serif" id="text81">16 bit-plane pairs per tile</text>
+      <text x="1157" y="482" fill="#455c6a" font-size="17" font-weight="normal" font-family="Verdana, sans-serif" id="text82">32 signed INT32 lanes</text>
+    </g>
+    <g id="output" inkscape:label="Result memory">
+      <rect x="1140" y="618" width="262" height="90" rx="6" fill="#f3f7f9" stroke="#254a60" stroke-width="1.5" id="rect82"/>
+      <text x="1157" y="649" fill="#254a60" font-size="23" font-weight="bold" font-family="Verdana, sans-serif" id="text83">Result memory</text>
+      <text x="1157" y="676" fill="#455c6a" font-size="17" font-weight="normal" font-family="Verdana, sans-serif" id="text84">One INT32 per output</text>
+    </g>
+  </g>
+  <g id="vpu" inkscape:label="Planned programmable VPU" inkscape:groupmode="layer">
+    <rect x="336" y="742" width="1086" height="393" rx="6" fill="#fbf9fd" stroke="#88699a" stroke-width="1.6" stroke-dasharray="8 5"/>
+    <text x="361" y="779" fill="#684580" font-family="Verdana, sans-serif" font-size="28" font-weight="bold" text-anchor="start">Programmable vector processing unit (VPU)</text>
+    <text x="1396" y="778" fill="#684580" font-family="Verdana, sans-serif" font-size="19" font-weight="bold" text-anchor="end">Planned integration</text>
+    <g id="vpu-links" inkscape:label="Vector data and control connections">
+      <path d="M1402 256 H1436 V841 H1391" fill="none" stroke="#21716d" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 5" marker-end="url(#arrow-control)" marker-start="url(#arrow-control)"/>
+      <path d="M1196 708 V724 H347 V1088 H615" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <text x="764" y="719" fill="#455c6a" font-family="Verdana, sans-serif" font-size="15" font-weight="normal" text-anchor="start">Projection results</text>
+      <path d="M1379 867 H1405 V967 H1392" fill="none" stroke="#21716d" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6 5" marker-end="url(#arrow-control)" marker-start="url(#arrow-control)"/>
+      <text x="1265" y="889" fill="#21716d" font-family="Verdana, sans-serif" font-size="16" font-weight="normal" text-anchor="start">Launch / join</text>
+      <path d="M535 867 V901" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M429.5 901 H1318.5" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <text x="727" y="894" fill="#455c6a" font-family="Verdana, sans-serif" font-size="16" font-weight="normal" text-anchor="start">Instruction fetch</text>
+      <path d="M429.5 901 V926" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M429.5 1020 V1041" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M556.5 901 V926" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M556.5 1020 V1041" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M683.5 901 V926" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M683.5 1020 V1041" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M810.5 901 V926" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M810.5 1020 V1041" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M937.5 901 V926" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M937.5 1020 V1041" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M1064.5 901 V926" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M1064.5 1020 V1041" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M1191.5 901 V926" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M1191.5 1020 V1041" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M1318.5 901 V926" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M1318.5 1020 V1041" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M429.5 1041 H1318.5" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M875 1041 V1062" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <text x="946" y="1059" fill="#455c6a" font-family="Verdana, sans-serif" font-size="16" font-weight="normal" text-anchor="start">Tensor loads and stores</text>
+    </g>
+    <g id="vpu-code" inkscape:label="Kernel instruction memory">
+      <rect x="369" y="806" width="325" height="61" rx="6" fill="#f3f7f9" stroke="#254a60" stroke-width="1.6"/>
+      <text x="384" y="831" fill="#254a60" font-family="Verdana, sans-serif" font-size="19.5" font-weight="bold" text-anchor="start">Kernel instruction memory</text>
+      <text x="384" y="852" fill="#455c6a" font-family="Verdana, sans-serif" font-size="15.5" font-weight="normal" text-anchor="start">Shared RISC-V program</text>
+    </g>
+    <g id="vpu-dispatch" inkscape:label="Kernel dispatcher">
+      <rect x="1092" y="806" width="299" height="61" rx="6" fill="#f1f8f7" stroke="#21716d" stroke-width="1.6"/>
+      <text x="1107" y="831" fill="#21716d" font-family="Verdana, sans-serif" font-size="21" font-weight="bold" text-anchor="start">Kernel dispatcher</text>
+      <text x="1107" y="852" fill="#455c6a" font-family="Verdana, sans-serif" font-size="12.5" font-weight="normal" text-anchor="start">Entry address, lane IDs and barrier</text>
+    </g>
+    <g id="vpu-core-bank" inkscape:label="Eight DarkRISCV processing lanes">
+      <rect x="359" y="926" width="1033" height="94" rx="6" fill="#f4eff7" stroke="#baabc5" stroke-width="1.6"/>
+      <path d="M429.5 926 V939" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <g id="darkriscv-core-0" inkscape:label="DarkRISCV core 0">
+        <rect x="370.0" y="939" width="119" height="63" rx="6" fill="#ffffff" stroke="#88699a" stroke-width="1.6"/>
+        <text x="429.5" y="964" fill="#593570" font-family="Verdana, sans-serif" font-size="17" font-weight="bold" text-anchor="middle">DarkRISCV</text>
+        <text x="429.5" y="987" fill="#594d63" font-family="Verdana, sans-serif" font-size="12.5" font-weight="normal" text-anchor="middle">Core 0 · RV32I</text>
+      </g>
+      <path d="M429.5 1020 V1002" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <path d="M556.5 926 V939" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <g id="darkriscv-core-1" inkscape:label="DarkRISCV core 1">
+        <rect x="497.0" y="939" width="119" height="63" rx="6" fill="#ffffff" stroke="#88699a" stroke-width="1.6"/>
+        <text x="556.5" y="964" fill="#593570" font-family="Verdana, sans-serif" font-size="17" font-weight="bold" text-anchor="middle">DarkRISCV</text>
+        <text x="556.5" y="987" fill="#594d63" font-family="Verdana, sans-serif" font-size="12.5" font-weight="normal" text-anchor="middle">Core 1 · RV32I</text>
+      </g>
+      <path d="M556.5 1020 V1002" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <path d="M683.5 926 V939" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <g id="darkriscv-core-2" inkscape:label="DarkRISCV core 2">
+        <rect x="624.0" y="939" width="119" height="63" rx="6" fill="#ffffff" stroke="#88699a" stroke-width="1.6"/>
+        <text x="683.5" y="964" fill="#593570" font-family="Verdana, sans-serif" font-size="17" font-weight="bold" text-anchor="middle">DarkRISCV</text>
+        <text x="683.5" y="987" fill="#594d63" font-family="Verdana, sans-serif" font-size="12.5" font-weight="normal" text-anchor="middle">Core 2 · RV32I</text>
+      </g>
+      <path d="M683.5 1020 V1002" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <path d="M810.5 926 V939" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <g id="darkriscv-core-3" inkscape:label="DarkRISCV core 3">
+        <rect x="751.0" y="939" width="119" height="63" rx="6" fill="#ffffff" stroke="#88699a" stroke-width="1.6"/>
+        <text x="810.5" y="964" fill="#593570" font-family="Verdana, sans-serif" font-size="17" font-weight="bold" text-anchor="middle">DarkRISCV</text>
+        <text x="810.5" y="987" fill="#594d63" font-family="Verdana, sans-serif" font-size="12.5" font-weight="normal" text-anchor="middle">Core 3 · RV32I</text>
+      </g>
+      <path d="M810.5 1020 V1002" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <path d="M937.5 926 V939" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <g id="darkriscv-core-4" inkscape:label="DarkRISCV core 4">
+        <rect x="878.0" y="939" width="119" height="63" rx="6" fill="#ffffff" stroke="#88699a" stroke-width="1.6"/>
+        <text x="937.5" y="964" fill="#593570" font-family="Verdana, sans-serif" font-size="17" font-weight="bold" text-anchor="middle">DarkRISCV</text>
+        <text x="937.5" y="987" fill="#594d63" font-family="Verdana, sans-serif" font-size="12.5" font-weight="normal" text-anchor="middle">Core 4 · RV32I</text>
+      </g>
+      <path d="M937.5 1020 V1002" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <path d="M1064.5 926 V939" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <g id="darkriscv-core-5" inkscape:label="DarkRISCV core 5">
+        <rect x="1005.0" y="939" width="119" height="63" rx="6" fill="#ffffff" stroke="#88699a" stroke-width="1.6"/>
+        <text x="1064.5" y="964" fill="#593570" font-family="Verdana, sans-serif" font-size="17" font-weight="bold" text-anchor="middle">DarkRISCV</text>
+        <text x="1064.5" y="987" fill="#594d63" font-family="Verdana, sans-serif" font-size="12.5" font-weight="normal" text-anchor="middle">Core 5 · RV32I</text>
+      </g>
+      <path d="M1064.5 1020 V1002" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <path d="M1191.5 926 V939" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <g id="darkriscv-core-6" inkscape:label="DarkRISCV core 6">
+        <rect x="1132.0" y="939" width="119" height="63" rx="6" fill="#ffffff" stroke="#88699a" stroke-width="1.6"/>
+        <text x="1191.5" y="964" fill="#593570" font-family="Verdana, sans-serif" font-size="17" font-weight="bold" text-anchor="middle">DarkRISCV</text>
+        <text x="1191.5" y="987" fill="#594d63" font-family="Verdana, sans-serif" font-size="12.5" font-weight="normal" text-anchor="middle">Core 6 · RV32I</text>
+      </g>
+      <path d="M1191.5 1020 V1002" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <path d="M1318.5 926 V939" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+      <g id="darkriscv-core-7" inkscape:label="DarkRISCV core 7">
+        <rect x="1259.0" y="939" width="119" height="63" rx="6" fill="#ffffff" stroke="#88699a" stroke-width="1.6"/>
+        <text x="1318.5" y="964" fill="#593570" font-family="Verdana, sans-serif" font-size="17" font-weight="bold" text-anchor="middle">DarkRISCV</text>
+        <text x="1318.5" y="987" fill="#594d63" font-family="Verdana, sans-serif" font-size="12.5" font-weight="normal" text-anchor="middle">Core 7 · RV32I</text>
+      </g>
+      <path d="M1318.5 1020 V1002" fill="none" stroke="#254a60" stroke-width="2.15" stroke-linejoin="round" stroke-linecap="round" marker-end="url(#arrow-data)"/>
+    </g>
+    <g id="vpu-scratchpad" inkscape:label="Banked tensor scratchpad">
+      <rect x="615" y="1062" width="457" height="57" rx="6" fill="#f3f7f9" stroke="#254a60" stroke-width="1.6"/>
+      <text x="630" y="1087" fill="#254a60" font-family="Verdana, sans-serif" font-size="21" font-weight="bold" text-anchor="start">Banked tensor scratchpad</text>
+      <text x="630" y="1108" fill="#455c6a" font-family="Verdana, sans-serif" font-size="13" font-weight="normal" text-anchor="start">Shared operands, partial reductions and kernel results</text>
+    </g>
+    <text x="720" y="832" fill="#684580" font-family="Verdana, sans-serif" font-size="19" font-weight="bold" text-anchor="start">Eight independent PCs</text>
+    <text x="720" y="854" fill="#455c6a" font-family="Verdana, sans-serif" font-size="16" font-weight="normal" text-anchor="start">One kernel across eight data lanes</text>
+  </g>
+</svg>

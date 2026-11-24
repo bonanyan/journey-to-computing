@@ -1,15 +1,29 @@
+<p align="center">
+  <img src="../assets/journey-computing-jc_v2.png" alt="Journey to Computing logo" width="144" height="86" />
+</p>
+
 Lab3 · Write a C++ simulator for a CIM array and Lab 2’s CPU–PIM system
 =======================================================================
 
+<p align="center">
+  <strong>Author:</strong> Dr. Bonan Yan (<a href="mailto:bonanyan@pku.edu.cn">bonanyan@pku.edu.cn</a>) · November 22, 2026
+</p>
+
+## What to do
+
 In Lab 2, you ran RISC-V firmware on the X-HEEP RTL and watched lane 31 produce 335. In this lab you will write the C++ that predicts that result and the clock edge when the CPU can read it. Start in Step 1 with a standalone computing-in-memory (CIM) array that sums products down each column. In Step 2, model Lab 2’s digital PIM (DPIM) macro, where each of 32 lanes produces its own 32-bit result. Run the same firmware on both implementations and compare their Open Bus Interface (OBI) transactions. [Lab 2 tutorial](../lab2-CPU+PIM/lab2-tutorial.html)
 
-Run the examples from the directory containing the Makefile with GNU Make and a C++17 compiler. Each step has its own build-and-run target.
+## How to run
 
-## Step 1. Simulate the CIM array on its own
+Run the examples from the directory containing the Makefile with GNU Make and a C++17 compiler. Run the standalone CIM array first, then run the bundled Lab 2 firmware images and trace the row-switch benchmark.
 
 ```sh
 make run-cim
+make run-cpu-cim
+./build/cosim examples/lab2/row_switch.hex --trace
 ```
+
+## Step 1. Simulate the CIM array on its own
 
 The standalone driver reads three sizes from a workload file, programs one weight matrix, and runs each input vector against those weights. The example contains three rows, two columns, and two vectors. [Workload](./examples/example.cim) · [Standalone driver](./simulators/cim.cpp)
 
@@ -58,10 +72,6 @@ To check weight reuse yourself, copy the workload, change the vector count from 
 
 Start with the program you ran in Lab 2. In `row_switch.S`, the CPU programs two weights in lane 31, first addresses row 0, then row 127, then returns to row 0. Run the four Lab 2 firmware images and trace this one in detail. The bundled images contain the assembled instructions and data used by the RTL testbench. This step needs only the host C++ compiler and Make. [Assembly source](../lab2-CPU+PIM/design/sw/benchmarks/row_switch.S) · [Firmware images](./examples/lab2/)
 
-```sh
-make run-cpu-cim
-./build/cosim examples/lab2/row_switch.hex --trace
-```
 
 ### Start with the CPU's load and store addresses
 
